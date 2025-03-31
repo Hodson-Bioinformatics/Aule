@@ -1,0 +1,39 @@
+lcr-modules:
+
+    aule_out_tables:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {normal_id} {pair_status}
+            sample_maf: "__UPDATE__"        # vcf2maf output
+            whitelist: "__UPDATE__"         # direct-specific formatted whitelist
+            drivers: "__UPDATE__"           # direct-specific formatted drivers list
+            panel: "__UPDATE__"             # BED file with panel cordinates
+            blacklisted_coord: "__UPDATE__" # Blacklisted coordinates
+
+        scratch_subdirectories: []
+
+        options:
+            filtering: True               # Boolean, whether to perfrom filtering or no [True|False]
+            shm_distance: 2000            # +/- distance from the TSS to consider for SHMs
+            min_pon: 0.02                 # Minimum tolerated frequency in the PON
+            min_germline: 1               # Minimum tolerated read support in germline for SLMS2 calls
+            max_error_prob: 0.0001        # Max tolerated error rate given the read support
+            min_umi: 9                    # Minimum number of nontrivial UMI families supporting a SLMS2 variant
+            max_sb: 0.01                  # Significance threshold for the strand bias test
+
+        resources:
+            by_mutation:
+                mem_mb: 40000
+
+        threads:
+            by_mutation: 6
+
+        conda_envs:
+            postprocessing: "{MODSDIR}/envs/postprocessing-1.2.yaml"
+
+        pairing_config:
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+

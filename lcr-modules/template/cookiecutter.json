@@ -1,0 +1,11 @@
+{
+  "module_name": null,
+  "module_author": null,
+  "original_author": null,
+  "input_file_type": null,
+  "output_file_type": null,
+  "module_run_per": ["sample", "tumour"],
+  "seq_type.genome": ["omit", "unpaired", "matched_only", "allow_unmatched", "no_normal"],
+  "seq_type.capture": ["omit", "unpaired", "matched_only", "allow_unmatched", "no_normal"],
+  "seq_type.mrna": ["omit", "unpaired", "matched_only", "allow_unmatched", "no_normal"]
+}

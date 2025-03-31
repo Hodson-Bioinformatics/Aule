@@ -1,0 +1,47 @@
+# This pipeline downloads data from SRA, including dbGaP access controlled data. 
+# It is set up to prefetch the files rather than pulling them directly with sam-dump or fasterq-dump 
+# because it is faster, more reliable, and restartable if the download gets interrupted. 
+# It is highly recommended to extract the prefetched files to fastq and align them yourself if possible, 
+# since fasterq-dump is multi-threaded and many times faster than sam-dump. 
+
+out_file_type: "__UPDATE__" # options: fastq, bam or cram. Only use bam or cram if the SRA data are already in an aligned format.
+accessions: "__UPDATE__" # file containing all SRA accession numbers for files to be downloaded. Must have one entry per line, no column names.
+
+params:
+  ngc: "/projects/rmorin/data/dbGaP/prj_24603.ngc" # ngc file; required for dbGaP restricted access projects. Default gives access to all of Ryan's projects. Leave blank for unrestricted repositories.
+  ref: "__UPDATE__" # Reference genome fasta. Required if in_file_type is sam and out_file_type is cram.
+  prefetch: "" # Additional arguments for `prefetch`. See `prefetch --help` for more details.
+  sam-dump: "-u -r" # Additional sam-dump options. See `sam-dump --help` for more details. Default -r recreates sam header; -u includes unaligned reads.
+  fastq_dump: "-3" # Additional fasterq-dump options. See `fasterq-dump --help` for more details. Default -3 splits fastq by read for paired end data; this Snakefile is incompatible with single-end data.
+  samtools: "" # Additional samtools view options. See `samtools view --help` for more details.
+
+conda:
+  sra-tools: "sra-tools.yaml" # Path to conda yaml file. Currently installed at `/projects/rmorin_scratch/conda_environments/bc30d4315aa1bb82767149df6dc7e11f`.
+
+threads:
+  prefetch: 1 # Single-threaded
+  sam_dump: 8 # Multi-threaded by default; this will set threads only on cluster submissions.
+  sam_to_bam: 8
+  index_bam: 1
+  fastq_dump: 8
+
+resources:
+  prefetch:
+    mem_mb: 15000
+    disk_mb: 300000 # Integer representing size in MB. Pick a value somewhat larger than the largest file you plan to download. Prefetch will fail if the file is larger than this value.
+  sam_dump:
+    mem_mb: 10000
+    disk_mb: 0 # Doesn't take up any real disk space becuase of pipe.
+  sam_to_bam:
+    mem_mb: 15000
+    disk_mb: 250000
+  index_bam:
+    mem_mb: 2000
+    disk_mb: 200
+  fastq_dump:
+    mem_mb: 10000
+    disk_mb: 300000 # No in-line compression available while splitting. Each fastq is slightly larger than the prefetched directory.
+  gzip_fastq:
+    mem_mb: 10000
+    disk_mb: 200000 # gzipped fastq is ~ 1/5 the size of the unzipped fastq
+

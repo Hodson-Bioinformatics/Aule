@@ -1,0 +1,40 @@
+lcr-modules:
+    
+    sv_merge:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            roi_coordinates: "__UPDATE__"
+            roi_annotations: "__UPDATE__"
+            igcaller_tsv: "results/igcaller-1.0/99-outputs/tsv/{seq_type}--{genome_build}/{tumour_id}--{normal_id}--{pair_status}.output.filtered.tsv"
+            gridss_vcf: "results/gridss-2.0/99-outputs/vcf/{seq_type}--{genome_build}/{tumour_id}--{normal_id}--{pair_status}.gridss_somatic_filtered.vcf.gz"
+            manta_vcf: "results/manta-2.3/99-outputs/vcf/{seq_type}--{genome_build}/somaticSV/{tumour_id}--{normal_id}--{pair_status}.somaticSV.vcf"
+
+        params:
+            vaf_threshold: 0.02
+
+        scripts:
+            format_output: "{MODSDIR}/src/R/format_output_v2.R"
+
+        scratch_subdirectories: []
+
+        conda_envs:
+            survivor: "{MODSDIR}/envs/survivor-1.0.yaml"
+            postprocessing: "{MODSDIR}/envs/postprocessing-1.0.yaml"
+            
+        threads:
+            _sv_merge_run: 1
+
+        resources:
+            _sv_merge_run: 
+                mem_mb: 2000
+            
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False

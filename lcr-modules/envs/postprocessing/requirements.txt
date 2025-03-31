@@ -1,0 +1,18 @@
+# Navigate to the lcr-modules/envs/postprocessing/
+# conda create -n postprocessing-1.3 -c conda-forge -c bioconda --file requirements.txt
+# conda activate postprocessing-1.3
+# conda env export > postprocessing-1.3.yaml
+r-base
+r-optparse
+r-tidyverse
+r-vcfR
+r-flexmix
+r-rmarkdown
+r-ggbreak
+bioconductor-maftools
+bioconductor-genomicranges
+bioconductor-biomart
+bioconductor-rtracklayer
+bioconductor-annotationhub
+bioconductor-bsgenome.hsapiens.ucsc.hg19
+bioconductor-bsgenome.hsapiens.ncbi.grch38

@@ -1,0 +1,50 @@
+name: phased_variants
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - bzip2=1.0.8=h7f98852_4
+  - c-ares=1.19.1=hd590300_0
+  - ca-certificates=2023.7.22=hbcca054_0
+  - keyutils=1.6.1=h166bdaf_0
+  - krb5=1.21.2=h659d440_0
+  - ld_impl_linux-64=2.40=h41732ed_0
+  - libcurl=8.2.1=hca28451_0
+  - libdeflate=1.18=h0b41bf4_0
+  - libedit=3.1.20191231=he28a2e2_2
+  - libev=4.33=h516909a_1
+  - libffi=3.4.2=h7f98852_5
+  - libgcc-ng=13.1.0=he5830b7_0
+  - libgomp=13.1.0=he5830b7_0
+  - libnghttp2=1.52.0=h61bc06f_0
+  - libnsl=2.0.0=h7f98852_0
+  - libsqlite=3.43.0=h2797004_0
+  - libssh2=1.11.0=h0841786_0
+  - libstdcxx-ng=13.1.0=hfd8a6a1_0
+  - libuuid=2.38.1=h0b41bf4_0
+  - libzlib=1.2.13=hd590300_5
+  - ncurses=6.4=hcb278e6_0
+  - openssl=3.1.2=hd590300_0
+  - pip=23.2.1=pyhd8ed1ab_0
+  - pysam=0.21.0=py310h41dec4a_1
+  - python=3.10.12=hd12c33a_0_cpython
+  - python_abi=3.10=3_cp310
+  - readline=8.2=h8228510_1
+  - setuptools=68.1.2=pyhd8ed1ab_0
+  - tk=8.6.12=h27826a3_0
+  - tzdata=2023c=h71feb2d_0
+  - wheel=0.41.2=pyhd8ed1ab_0
+  - xz=5.2.6=h166bdaf_0
+  - zlib=1.2.13=hd590300_5
+  - zstd=1.5.5=hfc55251_0
+  - pip:
+      - argparse==1.4.0
+      - biopython==1.81
+      - cython==3.0.2
+      - numpy==1.25.2
+      - pybedtools==0.9.1
+      - six==1.16.0
+prefix: /home/USSR/jak75/miniconda3/envs/phased_variants

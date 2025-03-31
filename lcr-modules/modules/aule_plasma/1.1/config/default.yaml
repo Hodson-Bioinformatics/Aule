@@ -1,0 +1,57 @@
+lcr-modules:
+
+    aule_plasma:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {normal_id} {pair_status}
+            sample_vcf_2plus: "__UPDATE__" # 2+ vcf (from slms3)
+            sample_tbi_2plus: "__UPDATE__" # 2+ tbi (from slms3)
+            sample_vcf_3plus: "__UPDATE__" # 3+ vcf (from slms3)
+            sample_tbi_3plus: "__UPDATE__" # 3+ tbi (from slms3)
+            sample_bam: "__UPDATE__" # UMI collapsed bam file (from aule_umi_collapse)
+            pon_vcf: "__UPDATE__" # vcf with PON (generated with CreateSomaticPanelOfNormals from GATK)
+            pon_tbi: "__UPDATE__" # tbi for PON (generated with CreateSomaticPanelOfNormals from GATK)
+            positional_error_rates: "__UPDATE__" # An indexed tab-delimited file with error rates per position
+            positional_error_header: "__UPDATE__" # A file with header lines to be added to the VCF file, see bcftools annotate
+            positional_error_tbi: "__UPDATE__" # A Tabix index for the tab file
+            directional_error_rates: "__UPDATE__" # A tab-delimited file with error rates per position and base change
+            directional_error_header: "__UPDATE__" # A tab-delimited header lines to be added t the VCF file, see bcftools annotate
+            directional_error_tbi: "__UPDATE__" # A Tabix index for the tab file
+
+        scratch_subdirectories: []
+
+        options:
+            umi_family_threshold_2plus: 10
+            pon_af_field: "FRACTION"
+
+        threads:
+            sort_bam: 4
+            annotate_vcf_pon_error: 1
+            annotate_vcf_slms3_umi: 1
+
+        resources:
+            sort_bam:
+                mem_mb: 12000
+            annotate_vcf_pon_error:
+                mem_mb: 3000
+            annotate_vcf_slms3_umi:
+                mem_mb: 6000
+
+        scripts:
+            annotate_vcf_slms3_umi: "{MODSDIR}/etc/python/annotate_vcf_slms3_umi.py"
+
+        conda_envs:
+            picard: "{MODSDIR}/envs/picard-2.27.5_samtools.yaml"
+            bcftools: "{MODSDIR}/envs/bcftools-1.20.yaml"
+            pysam: "{MODSDIR}/envs/pysam-0.18.0_multi.yaml"
+
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+

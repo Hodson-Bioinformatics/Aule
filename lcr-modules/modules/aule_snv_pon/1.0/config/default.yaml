@@ -1,0 +1,45 @@
+lcr-modules:
+    
+    aule_snv_pon:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+
+        scratch_subdirectories: []
+
+        options:
+            mutect2_run: "-max-mnp-distance 0 "
+            genomicsdb: ""
+            createpon: ""
+
+        conda_envs:
+            gatk: "{MODSDIR}/envs/gatk-4.1.8.1.yaml"
+            
+        threads:
+            mutect2_run: 10
+            genomicsdb: 10
+            createpon: 10
+
+        resources:
+            mutect2_run:
+                mem_mb: 20000
+            genomicsdb:
+                mem_mb: 20000
+            createpon:
+                mem_mb: 20000
+            
+        pairing_config:
+            genome:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            mrna:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

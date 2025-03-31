@@ -1,0 +1,10 @@
+# Navigate to the lcr-modules/envs/vcf2maf/
+# conda create -n vcf2maf-1.7.0 -c bioconda --file requirements.txt
+# conda activate vcf2maf-1.7.0
+# conda env export > vcf2maf-1.7.0.yaml
+ensembl-vep
+
+### legacy
+# conda create --name vcf2maf-1.7.0
+# conda activate vcf2maf-1.7.0
+# conda install -c bioconda ensembl-vep

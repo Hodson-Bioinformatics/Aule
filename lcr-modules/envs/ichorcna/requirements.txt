@@ -1,0 +1,5 @@
+# Navigate to lcr-modules/envs/ichorcna/
+# conda create -n ichorcna-1.0 -c conda-forge -c bioconda --file requirements.txt
+# conda activate ichorcna-1.0
+# conda env export > ichorcna-1.0.yaml
+r-ichorcna

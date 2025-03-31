@@ -1,0 +1,87 @@
+lcr-modules:
+    
+    aule_pv:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_bam: "__UPDATE__"
+            panel: "__UPDATE__"   # BED file with teh capture panel region
+            pon_pv: "__UPDATE__"  # Panel of normals PVs (needs to contain pv_type wildcard)
+            pon_snv: "__UPDATE__" # Panel of normals SNVs
+            gnomad: "__UPDATE__"  # Gnomad database
+           
+        scripts:
+            find_all_phased_variants: "{MODSDIR}/etc/python/find_all_PV.py"
+            annotate_phased_variants: "{MODSDIR}/etc/python/annotate_PV.py"
+            score_PV_regions: "{MODSDIR}/etc/python/score_regions.py"
+            
+
+        scratch_subdirectories: []
+
+        options:
+            min_mapping_qual: 20
+            min_base_qual: 20
+            r1r2: "concordant"
+            detailed: F
+            genotype_PV:
+                max_matched_germline_support: 0
+                max_cohort_germline_support: 0
+                max_gnomad_support: 0.001
+                min_AF: 0.002
+                min_DP: 100
+                max_pon_snv_support: 0.01
+                max_pon_pv_support: 1
+            mrd_stat:
+                monte_carlo_iterations: 10000
+                
+            
+        conda_envs:
+            phased_variants: "{MODSDIR}/envs/phased_variants-1.1.yaml"
+            bedtools: "{MODSDIR}/envs/bedtools-2.29.2.yaml"
+            gatk: "{MODSDIR}/envs/gatk-4.1.8.1.yaml"
+            postprocessing: "{MODSDIR}/envs/postprocessing-1.1.yaml"
+            coreutils: "{MODSDIR}/envs/coreutils-8.31.yaml"
+            
+        threads:
+            find_all_phased_variants: 2
+            collapse_phased_variants: 5
+            annotate_phased_variants: 7
+            genotype_phased_variants: 5
+            track_phased_variants: 5
+            mrd_phased_variants: 10
+            report_phased_variants: 5
+            sort_bam: 4
+            
+        resources:
+            find_all_phased_variants: 
+                mem_mb: 2000
+            annotate_phased_variants:
+                mem_mb: 2000
+            collapse_phased_variants:
+                mem_mb: 5000
+            genotype_phased_variants:
+                mem_mb: 5000
+            track_phased_variants:
+                mem_mb: 5000
+            mrd_phased_variants:
+                mem_mb: 5000
+            report_phased_variants:
+                mem_mb: 5000
+            sort_bam: 
+                mem_mb: 20000
+            
+            
+            
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            mrna:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False

@@ -1,0 +1,53 @@
+lcr-modules:
+    
+    aule_pv_pon:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_bam: "__UPDATE__"
+            panel: "__UPDATE__"   # BED file with teh capture panel region
+           
+        scripts:
+            find_all_phased_variants: "{MODSDIR}/etc/python/find_all_PV.py"
+            annotate_phased_variants: "{MODSDIR}/etc/python/annotate_PV.py"
+
+        scratch_subdirectories: []
+
+        options:
+            pon_samples: ""
+            min_mapping_qual: 50
+            min_base_qual: 20
+            r1r2: "concordant"
+            detailed: F
+                
+        conda_envs:
+            phased_variants: "{MODSDIR}/envs/phased_variants-1.1.yaml"
+            bedtools: "{MODSDIR}/envs/bedtools-2.29.2.yaml"
+            gatk: "{MODSDIR}/envs/gatk-4.1.8.1.yaml"
+            postprocessing: "{MODSDIR}/envs/postprocessing-1.1.yaml"
+            coreutils: "{MODSDIR}/envs/coreutils-8.31.yaml"
+            
+        threads:
+            find_all_phased_variants: 2
+            collapse_phased_variants: 5
+            annotate_phased_variants: 5
+            generate_pon: 20
+            sort_bam: 4
+            
+        resources:
+            find_all_phased_variants: 
+                mem_mb: 2000
+            collapse_phased_variants:
+                mem_mb: 5000
+            annotate_phased_variants:
+                mem_mb: 5000
+            generate_pon:
+                mem_mb: 2000
+            sort_bam: 
+                mem_mb: 20000
+            
+        pairing_config:
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

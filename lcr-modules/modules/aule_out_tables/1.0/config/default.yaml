@@ -1,0 +1,43 @@
+lcr-modules:
+
+    aule_out_tables:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {normal_id} {pair_status}
+            sample_vcf: "__UPDATE__"   # slms3 (final) output
+            sample_maf: "__UPDATE__"   # vcf2maf output
+            samples: "__UPDATE__"      # will usually be data/samples.tsv
+            patient_info: "__UPDATE__" # per-patient info (patient_id col as key)
+            sample_info: "__UPDATE__"  # per-sample info (CMDL_ID col as key, but this should change to sample_id at some point)
+            whitelist: "__UPDATE__"    # direct-specific formatted whitelist
+            drivers: "__UPDATE__"      # direct-specific formatted drivers list
+
+        scratch_subdirectories: []
+
+        options:
+            maf_filter: "deblacklisted" # raw or deblacklisted
+            maf_type: "maf" # maf or augmented_maf
+            maf_base_name: "slms-3.final" # should match config["lcr-modules"]["vcf2maf"]["vcf_base_name"]
+            vaf_filter: 0.01 # filter out any mutation below this
+            shm_distance: 2000 # +/- distance from the TSS to consider for SHMs
+
+        resources:
+            aule_out_tables:
+                mem_mb: 40000
+
+        scripts:
+            join_sample_info: "{MODSDIR}/etc/R/join_sample_info.R"
+            join_patient_info: "{MODSDIR}/etc/R/join_patient_info.R"
+
+        conda_envs:
+            aule_out_tables: "{MODSDIR}/envs/postprocessing-1.2.yaml"
+
+        # threads:
+        #
+        # resources:
+
+        pairing_config:
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False

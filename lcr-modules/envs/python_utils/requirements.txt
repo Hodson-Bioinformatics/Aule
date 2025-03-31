@@ -1,0 +1,8 @@
+# Navigate to the lcr-modules/envs/python_utils/
+# conda create -n python_utils-1.1  python=3.9
+# conda install -n python_utils-1.1 -c conda-forge -c bioconda --file requirements.txt
+# conda activate python_utils-1.1
+# conda env export > python_utils-1.1.yaml
+numpy
+pandas
+pysam

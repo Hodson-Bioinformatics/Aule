@@ -1,0 +1,70 @@
+lcr-modules:
+    
+    aule_preprocessing:
+
+        inputs:
+            # Available wildcards: {sample_id} {genome_build} {seq_type}
+            bed:
+                hg38: "__UPDATE__"
+                # make sure this corresponds with config["lcr-modules"]["picard_qc"]["switches"]["capture_intervals"]["_default"]
+
+        scratch_subdirectories: []
+
+        options:
+            fastq_to_unmapped_bam: "--READ_GROUP_NAME {sample_id} --PLATFORM Illumina"
+            annotate_bam_with_umis: "-t RX -q RQ --fail-fast true"
+            java_fgbio: "-Xms500m -Xmx60g"
+            bwa_input: "CLIPPING_ATTRIBUTE=XT CLIPPING_ACTION=2 INTERLEAVE=true NON_PF=true"
+            bwa_mem: "-M -p"
+            merge_bam_alignment: "--CREATE_INDEX true --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XA --ATTRIBUTES_TO_RETAIN XS --ATTRIBUTES_TO_RETAIN XT --ATTRIBUTES_TO_RETAIN RX --ATTRIBUTES_TO_RETAIN RQ "
+            fix_tags: "--CREATE_INDEX true"
+            java_gatk: "--java-options '-Xmx60G'"
+            mark_duplicates: "--BARCODE_TAG RX --CREATE_INDEX true --MAX_RECORDS_IN_RAM 50000"
+            base_recalibration: "--use-original-qualities -known-sites ../../../reference/known_sites/hg38/Homo_sapiens_assembly38.dbsnp138.vcf -known-sites ../../../reference/known_sites/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz -known-sites ../../../reference/known_sites/hg38/Homo_sapiens_assembly38.known_indels.vcf.gz" # TODO: add known sites to reference
+            apply_bsqr: "--static-quantized-quals 10 --static-quantized-quals 20 --static-quantized-quals 30 --add-output-sam-program-record --create-output-bam-md5 true --create-output-bam-index true --use-original-qualities"
+
+        conda_envs:
+            picard: "{MODSDIR}/envs/picard-2.27.5.yaml"
+            fgbio: "{MODSDIR}/envs/fgbio-2.1.0.yaml"
+            bwa_aule: "{MODSDIR}/envs/bwa-0.7.17_samtools-1.9_aule.yaml"
+            gatk: "{MODSDIR}/envs/gatk-4.1.8.1.yaml"
+            
+        threads:
+            fastq_to_unmapped_bam: 10
+            annotate_bam_with_umis: 20
+            mark_illumina_adapters: 10
+            bwa_input: 10
+            bwa_mem: 20
+            merge_bam_alignment: 10
+            fix_tags: 10
+            mark_duplicates: 20
+            base_recalibration: 10
+            apply_bsqr: 10
+
+        resources:
+            fastq_to_unmapped_bam: 
+                mem_mb: 2000
+            annotate_bam_with_umis:
+                mem_mb: 60000
+            mark_illumina_adapters:
+                mem_mb: 60000
+            bwa_input:
+                mem_mb: 2000
+            bwa_mem:
+                mem_mb: 6000
+            merge_bam_alignment:
+                mem_mb: 6000
+            fix_tags:
+                mem_mb: 6000
+            mark_duplicates: 
+                mem_mb: 100000
+            base_recalibration: 
+                mem_mb: 6000
+            apply_bsqr: 
+                mem_mb: 6000
+                
+        pairing_config:
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

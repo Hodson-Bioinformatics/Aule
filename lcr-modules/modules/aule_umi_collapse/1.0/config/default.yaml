@@ -1,0 +1,83 @@
+lcr-modules:
+    
+    aule_umi_collapse:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+
+        options:
+            bwa_input: "CLIPPING_ATTRIBUTE=XT CLIPPING_ACTION=2 INTERLEAVE=true NON_PF=true"
+            bwa_mem: "-M -p"
+            merge_bam_alignment: "--CREATE_INDEX true --ADD_MATE_CIGAR true --CLIP_ADAPTERS false --CLIP_OVERLAPPING_READS true --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XA --ATTRIBUTES_TO_RETAIN XS --ATTRIBUTES_TO_RETAIN XT --ATTRIBUTES_TO_RETAIN RX --ATTRIBUTES_TO_RETAIN RQ --ATTRIBUTES_TO_RETAIN cE --ATTRIBUTES_TO_RETAIN cM --ATTRIBUTES_TO_RETAIN cD "
+            
+
+        conda_envs:
+            samtools: "{MODSDIR}/envs/samtools-1.9.yaml"
+            fgbio: "{MODSDIR}/envs/fgbio-2.1.0.yaml"
+            picard: "{MODSDIR}/envs/picard-2.27.5.yaml"
+            bwa_aule: "{MODSDIR}/envs/bwa-0.7.17_samtools-1.9_aule.yaml"
+            gatk: "{MODSDIR}/envs/gatk-4.1.8.1.yaml"
+            
+            
+        threads:
+                keep_proper_pairs: 4
+                sortbam_queryname: 5
+                set_mate_info: 5
+                group_by_umi: 5
+                sortbam_coordinates: 5
+                bwa_input: 10
+                bwa_mem: 10
+                consensus_reads: 10
+                merge_bam_alignment: 10
+
+            resources:
+                sortbam_queryname:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 31000
+                    runtime: 40
+                set_mate_info:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 31000
+                    runtime: 60
+                group_by_umi:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 31000
+                    runtime: 90
+                sortbam_coordinates:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 31000
+                    runtime: 40
+                consensus_reads:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 31000
+                    runtime: 120
+                bwa_mem:
+                    mem_mb_java: "-Xms500m -Xmx15g"
+                    mem_mb: 15000
+                    runtime: 30
+                merge_bam_alignment:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 32000
+                    runtime: 30
+                sortbam_queryname_picard:
+                    mem_mb_java: "-Xms500m -Xmx30g"
+                    mem_mb: 32000
+                    runtime: 30
+            
+                
+            
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: null
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: null
+                run_paired_tumours_as_unpaired: False
+            mrna:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: null
+                run_paired_tumours_as_unpaired: False

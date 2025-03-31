@@ -1,0 +1,73 @@
+lcr-modules:
+
+    ichorcna_pon:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+
+        scratch_subdirectories: []
+
+        options:
+            ichorcna_branch: "master"
+            binSize:  1000 # set window size (in kB) to compute coverage
+                    # available binSizes are: 1000, 500, 50, 10
+            pon_suffix: "full"
+                    # available suffixes: [full, panel] (if panel regions are provided in CFG["ichorcna_pon"]["opts"] for -e parameter in the PON creating script)
+            bamCoverage:
+                opts: "--ignoreDuplicates --extendReads --samFlagExclude 1028 --minMappingQuality 20"
+            ichorcna_pon:
+                genome_style:  # can set this to UCSC or NCBI
+                    grch37: "NCBI"
+                    grch38: "NCBI"
+                    hg19: "UCSC"
+                    hg38: "UCSC"
+                genome_ucsc:
+                    grch37: "hg19"
+                    grch38: "hg38"
+                    hg19: "hg19"
+                    hg38: "hg38"
+                centromere:
+                     grch37: "GRCh37.p13_centromere_UCSC-gapTable.txt"
+                     grch38: "GRCh38.GCA_000001405.2_centromere_acen.txt"
+                     hg19: "GRCh37.p13_centromere_UCSC-gapTable.txt"
+                     hg38: "GRCh38.GCA_000001405.2_centromere_acen.txt"
+                method: "median"
+                opts: "" # Optional arguments: --maleChrXLogRThres 0.8  --method median -e panel.bed
+
+        conda_envs:
+            bamCoverage: "{MODSDIR}/envs/deeptools-3.5.1.yaml"
+            bigwigToWig: "{MODSDIR}/envs/ucsc-bigwigtowig-448.yaml"
+            convert_wig: "{MODSDIR}/envs/bedops-2.4.39.yaml"
+            ichorcna_pon: "{MODSDIR}/envs/ichorcna-0.2.0.yaml"
+
+        threads:
+            bamCoverage: 5
+            bigwigToWig: 5
+            convert_wig: 5
+            ichorcna_pon: 5
+
+        resources:
+            bamCoverage:
+                mem_mb: 20000
+            bigwigToWig:
+                mem_mb: 20000
+            convert_wig:
+                mem_mb: 20000
+            ichorcna_pon:
+                mem_mb: 20000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            mrna:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

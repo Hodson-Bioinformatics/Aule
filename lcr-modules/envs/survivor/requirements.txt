@@ -1,0 +1,2 @@
+# cmd: conda create -n survivor-1.0 -c bioconda --file requirements.txt
+survivor

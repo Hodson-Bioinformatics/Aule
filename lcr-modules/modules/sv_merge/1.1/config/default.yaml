@@ -1,0 +1,45 @@
+lcr-modules:
+    
+    sv_merge:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            # EXPECTED INPUTS:
+            # roi_annotations is a .csv file with regions of interest plus HGNC names, used to annotate SV genes.
+            # gridss_vcf is the final somatic/GRIPSS filtered output vcf from GRIDSS.
+            # manta_vcf is the final somatic SV output vcf from Manta.
+            # samples is the samples.tsv file.
+            roi_annotations: "__UPDATE__"
+            gridss_vcf: "__UPDATE__"
+            manta_vcf: "__UPDATE__"
+            samples: "__UPDATE__"
+
+
+        params:
+            SR_filter: "4"
+            RP_filter: "4"
+
+        scripts:
+            merge_caller_output: "{MODSDIR}/src/R/merge_caller_output.R"
+            roi_filter_output: "{MODSDIR}/src/R/roi_filter_output.R"
+            summarise_output: "{MODSDIR}/src/R/summarise_output.R"
+
+        conda_envs:
+            postprocessing: "{MODSDIR}/envs/postprocessing-1.2.yaml"
+            
+        threads:
+            _sv_merge_run: 1
+
+        resources:
+            _sv_merge_run: 
+                mem_mb: 2000
+            
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False

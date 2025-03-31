@@ -1,0 +1,32 @@
+lcr-modules:
+    
+    aule_error:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            
+            # UMI collapsed bam, aligned and sorted by query name
+            # (usually the output of aule_umi_collapse module)
+            sample_bam: "__UPDATE__"
+            # BED file with panel/capture regions to be analysed
+            regions_bed: "__UPDATE__"
+
+        scratch_subdirectories: []
+
+        options:
+        
+        scripts:
+            bed_to_coords: "{MODSDIR}/etc/R/bed_to_coords.R"
+            collapse_errors: "{MODSDIR}/etc/python/collapse_errors.py"
+            merge_sample_errors: "{MODSDIR}/etc/R/merge_sample_errors.R"
+        
+        conda_envs:
+            bed_to_coords: "{MODSDIR}/envs/postprocessing-1.2.yaml"
+            collapse_errors: "{MODSDIR}/envs/python_utils-1.1.yaml"
+            merge_sample_errors: "{MODSDIR}/envs/postprocessing-1.2.yaml"
+        
+        pairing_config:
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

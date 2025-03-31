@@ -1,0 +1,57 @@
+lcr-modules:
+
+    aule_plasma:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {sample_id}
+            sample_vcf: "__UPDATE__"
+            sample_tbi: "__UPDATE__"
+            sample_bam_raw: "__UPDATE__"
+            sample_bai_raw: "__UPDATE__"
+            sample_bam_collapsed: "__UPDATE__"
+            pon: "__UPDATE__"
+
+        vcf_base_name: "slms-3.union"
+
+        scratch_subdirectories: []
+
+        scripts:
+            annotate_variants: "{MODSDIR}/etc/python/low_vaf_annotate_vcf.py"
+
+        options:
+            min_base_qual: 0
+            min_mapping_qual: 0
+
+        conda_envs:
+            fgbio: "{MODSDIR}/envs/fgbio-2.1.0.yaml"
+            picard: "{MODSDIR}/envs/picard-2.27.5.yaml"
+            bcftools: "{MODSDIR}/envs/bcftools-1.20.yaml"
+            pysam: "{MODSDIR}/envs/pysam-0.18.0_multi.yaml"
+
+
+        threads:
+            sortbam_coordinates: 4
+            bcftools: 1
+            annotated_variants: 2
+
+        resources:
+            sortbam_coordinates:
+                mem_mb: 12000
+            bcftools:
+                mem_mb: 3000
+            annotated_variants:
+                mem_mb: 24000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
+            mrna:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "unmatched_normal"
+                run_paired_tumours_as_unpaired: False
