@@ -1,23 +1,32 @@
-# Aule
+# AULE
 
-![Lymphoma-3](https://github.com/Hodson-Bioinformatics/Aule/assets/32344189/b063b1cc-ca76-454d-b803-ac39c8818a94)
+![aule_logo_v1](https://github.com/user-attachments/assets/f53e6b12-0ede-4310-84cf-2633fa547592)
 
-## What is AULE?
-Aule is the Automated Ultrasensitive Lymphoma Evaluation pipeline performing end-to-end analysis of circulating tumour DNA (ctDNA) in patients with Large B-cell Lymphoma (LBCL). 
+**Aule** (Automated Ultrasensitive Lymphoma Evaluation) is a pipeline performing end-to-end analysis of circulating tumour DNA (ctDNA) in patients with Large B-cell Lymphoma (LBCL). 
 AULE has a modular architecture following the framework of the [LCR pipeline](https://lcr-modules.readthedocs.io/en/latest/), 
-developed by Prof. Ryan Morin's lab. 
+developed by Prof. Ryan Morin's lab. It can be used as a comprehensive standalone software package or integrated as an add-on to an existing LCR pipeline.
 
-## Quick start 
+[Preprint link TBA]()
+ 
+## 🔬 Background
 
-1. Download a copy of the repository to your local directory 
+Recent studies have generated considerable interest in the potential of ctDNA to transform LBCL management and facilitate precision medicine trials with treatments tailored to individual risk profiles and biological subtypes. However, the majority of current ctDNA analysis platforms are proprietary "black-box" assays that offer limited opportunities for customization, further development, and rigorous validation. To address these limitations, we have developed a comprehensive open-source pipeline that renders ctDNA analysis both accessible and cost-effective for research.
 
-```
-git clone https://github.com/Hodson-Bioinformatics/Aule.git
-```
+## 📒 AULE usage 
 
-2. Create a baseline conda environment from `setup/envs/aule_py3.7.yaml`
+Learn more on [AULE wiki]() 
 
-```
-cd Aule
-conda env create -f setup/envs/aule_py3.7.yaml
-```
+#### ⚡️ Quick links
+
+TBA
+
+## 🎯 Applications
+
+[DIRECT trial](https://cctu.org.uk/portfolio/cancer/trials-closed-to-recruitment-in-follow-up/direct) - a multisite prospective molecular profiling trial of patients undergoing first-line therapy for aggressive B-cell Non-Hodgkin lymphoma
+
+## 💪 Contributors 
+
+[Joanna A. Krupka](https://github.com/ashakru)  
+[Ilias Moutsopoulos](https://github.com/emouts)  
+[Natasha H Cutmore](https://github.com/nuttynutmore)   
+[Daniej J Hodson](https://www.stemcells.cam.ac.uk/people/pi/hodson)  
