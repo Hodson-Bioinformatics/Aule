@@ -24,6 +24,10 @@ TBA
 
 [DIRECT trial](https://cctu.org.uk/portfolio/cancer/trials-closed-to-recruitment-in-follow-up/direct) - a multisite prospective molecular profiling trial of patients undergoing first-line therapy for aggressive B-cell Non-Hodgkin lymphoma
 
+## 🤝 Contributing to AULE
+
+TBA
+
 ## 💪 Contributors 
 
 [Joanna A. Krupka](https://github.com/ashakru)  
