@@ -1,0 +1,73 @@
+lcr-modules:
+    _shared:
+          lcr-modules: "../lcr-modules/"
+          lcr-scripts: "../lcr-scripts/"
+          root_output_dir: "results/"
+          scratch_directory: "scratch/"
+          unmatched_normal_ids:
+              capture--hg38: "TCRBOA7-N-WEX"
+            
+    aule_preprocessing:
+        inputs:
+            bed:
+                hg38: "data/bed/hg38/panel.bed"
+        options:
+            mark_duplicates: "--BARCODE_TAG RX --CREATE_INDEX true --MAX_RECORDS_IN_RAM 100000"
+            
+        resources:
+            fastq_to_unmapped_bam: 
+                mem_mb: 13000 
+                slurm_partition: "icelake-himem"
+                runtime: 120
+            annotate_bam_with_umis:
+                mem_mb: 100000 
+                slurm_partition: "icelake-himem"
+                runtime: 1000
+            mark_duplicates:
+                mem_mb: 90000 
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            mark_illumina_adapters:
+                mem_mb: 60000 
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            bwa_input:
+                mem_mb: 2000 
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            bwa_mem:
+                mem_mb: 45000
+                slurm_partition: "icelake"
+                runtime: 180
+            merge_bam_alignment:
+                mem_mb: 20000
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            fix_tags:
+                mem_mb: 13000
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            mark_duplicates: 
+                mem_mb: 100000
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            base_recalibration: 
+                mem_mb: 50000
+                slurm_partition: "icelake-himem"
+                runtime: 180
+            apply_bsqr: 
+                mem_mb: 12000
+                slurm_partition: "icelake-himem"
+                runtime: 180
+                
+        threads:
+            fastq_to_unmapped_bam: 2
+            annotate_bam_with_umis: 15
+            mark_illumina_adapters: 2
+            bwa_input: 1
+            bwa_mem: 15
+            merge_bam_alignment: 2
+            fix_tags: 2
+            mark_duplicates: 2
+            base_recalibration: 2
+            apply_bsqr: 2
