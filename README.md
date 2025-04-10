@@ -13,11 +13,13 @@ Recent studies have generated considerable interest in the potential of ctDNA to
 
 ## 📒 AULE usage 
 
-Learn more on [AULE wiki]() 
+Learn more on [AULE wiki](https://github.com/Hodson-Bioinformatics/Aule/wiki) 
 
 #### ⚡️ Quick links
 
-TBA
+[Installation](https://github.com/Hodson-Bioinformatics/Aule/wiki/Installation)  
+[AULE architecture and an example workflow](https://github.com/Hodson-Bioinformatics/Aule/wiki/Architecture-and-basic-workflow)  
+[How to setup your first AULE run](https://github.com/Hodson-Bioinformatics/Aule/wiki/Typical-run-setup)  
 
 ## 🎯 AULE in action
 
