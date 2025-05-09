@@ -23,7 +23,7 @@ lcr-modules:
                 capture: ""
 
         conda_envs:
-            lofreq: "{MODSDIR}/envs/lofreq-2.1.5.yml"
+            lofreq: "{MODSDIR}/envs/lofreq-2.1.5.yaml"
             bcftools: "{MODSDIR}/envs/bcftools-1.10.2.yaml"
             
         threads:
