@@ -21,7 +21,7 @@ lcr-modules:
             manta: "2.3" # Minimum: 2.0
             strelka: "1.1" # Minimum: 1.1
             lofreq: "1.1" # Minimum: 1.0
-            sage: "1.0" # Minimum: 1.0
+            sage: "1.1" # Minimum: 1.0
             mutect2: "2.0" # Minimum: 2.0
             starfish: "2.0" # Minimum: 2.0
 
