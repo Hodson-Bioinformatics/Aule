@@ -5,7 +5,7 @@
 **Aule** (Automated Ultrasensitive Lymphoma Evaluation) is a pipeline performing end-to-end analysis of circulating tumour DNA (ctDNA) in patients with Large B-cell Lymphoma (LBCL). 
 AULE has a modular architecture following the framework of the [LCR pipeline](https://lcr-modules.readthedocs.io/en/latest/), developed by Prof. Ryan Morin's lab. AULE can be used as a comprehensive standalone software package or integrated as an add-on to an existing LCR pipeline.
 
-[Preprint link TBA](https://doi.org/10.1101/2025.04.14.25325806)
+[Preprint link](https://doi.org/10.1101/2025.04.14.25325806)
  
 ## 🔬 Background
 
