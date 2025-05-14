@@ -34,7 +34,6 @@ if version.parse(current_version) < version.parse(min_oncopipe_version):
 
 # Setup module and store module-specific configuration in `CFG`
 # `CFG` is a shortcut to `config["lcr-modules"]["aule_preprocessing"]`
-print(config["lcr-modules"]["aule_preprocessing"])
 CFG = op.setup_module(
     name = "aule_preprocessing",
     version = "1.0",
