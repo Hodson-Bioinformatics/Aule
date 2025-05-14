@@ -47,10 +47,7 @@ lcr-modules:
                 mem_mb: 13000
                 slurm_partition: "icelake-himem"
                 runtime: 180
-            mark_duplicates: 
-                mem_mb: 100000
-                slurm_partition: "icelake-himem"
-                runtime: 180
+# Removed duplicate mark_duplicates entry
             base_recalibration: 
                 mem_mb: 50000
                 slurm_partition: "icelake-himem"
