@@ -76,8 +76,8 @@ rule _aule_preprocessing_fastq_to_unmapped_bam:
         stderr = CFG["logs"]["fastq_to_unmapped_bam"] + "{seq_type}/{sample_id}.preproc_fastq_to_unmapped.stderr.log"
     params:
         options = CFG["options"]["fastq_to_unmapped_bam"],
-        library_name = lambda wildcards: SAMPLES.loc[SAMPLES["sample_id"] == wildcards.sample_id, "CMDL_ID"].values[0],
-        comment = lambda wildcards: SAMPLES.loc[SAMPLES["sample_id"] == wildcards.sample_id, "seq_batch"].values[0],
+        library_name = lambda wildcards: SAMPLES.loc[SAMPLES["sample_id"] == wildcards.sample_id, "library_id"].values[0],
+        comment = lambda wildcards: SAMPLES.loc[SAMPLES["sample_id"] == wildcards.sample_id, "sample_meta"].values[0],
         scratch = CFG["scratch_directory"]     
     conda:
         CFG["conda_envs"]["picard"]

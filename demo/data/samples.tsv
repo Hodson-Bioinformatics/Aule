@@ -1,0 +1,2 @@
+sample_id	seq_type	patient_id	sample_type	timepoint	version	tissue_status	library_id	genome_build	strand	read_length	capture_space	sample_fastq_R1	sample_fastq_R2	sample_fastq_UMI	sample_meta
+p01_test_v1	capture	p01	Plasma	B	v1	tumour	lib01	hg38	positive	150	exome-DIRECT	fastq/sample_R1.fastq.gz	fastq/sample_R2.fastq.gz	fastq/sample_UMI.fastq.gz	example_meta1;example_meta2
