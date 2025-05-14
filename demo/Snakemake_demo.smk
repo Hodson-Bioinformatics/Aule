@@ -2,7 +2,8 @@
 
 '''
 This Snakefile is made to run all the modules compatible with Capture workflow.
-Compatibility of a workflow can be checked by referring to the pairing_config parameter present in a default.yaml file of that module.
+Compatibility of a workflow can be checked by referring to the pairing_config parameter 
+present in a default.yaml file of that module.
 '''
 ##### SETUP #####
 
@@ -16,9 +17,9 @@ subworkflow reference_files:
     workdir:
         "reference/"
     snakefile:
-        "../workflows/reference_files/2.4/reference_files.smk"
+        "../lcr-modules/workflows/reference_files/2.4/reference_files.smk"
     configfile:
-        "../workflows/reference_files/2.4/config/default.yaml"
+        "../lcr-modules/workflows/reference_files/2.4/config/default.yaml"
 
 ##### CONFIGURATION FILES #####
 
