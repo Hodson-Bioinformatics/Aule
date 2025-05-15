@@ -218,7 +218,8 @@ rule _aule_preprocessing_merge_bam_alignment:
     input:
         ubam = str(rules._aule_preprocessing_mark_illumina_adapters.output.ubam),
         bam = str(rules._aule_preprocessing_bwa_mem.output.bam),
-        ref = reference_files("genomes/{genome_build}/genome_fasta/genome.fa")
+        ref = reference_files("genomes/{genome_build}/genome_fasta/genome.fa"),
+        dict = reference_files("genomes/{genome_build}/genome_fasta/genome.dict")
     output:
         bam = temp(CFG["dirs"]["merge_bam_alignment"] + "{seq_type}--{genome_build}/{sample_id}.merged.bam")
     log:
