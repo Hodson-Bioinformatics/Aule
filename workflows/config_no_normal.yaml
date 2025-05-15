@@ -1,0 +1,108 @@
+lcr-modules:
+    _shared:
+          lcr-modules: "../lcr-modules/"
+          lcr-scripts: "../lcr-scripts/"
+          root_output_dir: "results/"
+          scratch_directory: "scratch/"
+          unmatched_normal_ids:
+              capture--hg38: "TCRBOA7-N-WEX"
+            
+    aule_preprocessing:
+        inputs:
+            bed:
+                hg38: "data/bed/hg38/panel.bed"
+        options:
+            mark_duplicates: "--BARCODE_TAG RX --CREATE_INDEX true --MAX_RECORDS_IN_RAM 100000"
+            base_recalibration: "--use-original-qualities --known-sites data/known_sites/Homo_sapiens_assembly38.dbsnp138.tp53.vcf.gz" # This should contain known-sites (eg. Homo_sapiens_assembly38.dbsnp138.vcf, Mills_and_1000G_gold_standard.indels.hg38.vcf.gz, Homo_sapiens_assembly38.known_indels.vcf.gz) for recalibration, we'll skip it for now
+
+        resources:
+            fastq_to_unmapped_bam: 
+                mem_mb: 13000 
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            annotate_bam_with_umis:
+                mem_mb: 100000 
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            mark_duplicates:
+                mem_mb: 90000 
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            mark_illumina_adapters:
+                mem_mb: 60000 
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            bwa_input:
+                mem_mb: 2000 
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            bwa_mem:
+                mem_mb: 45000
+                slurm_partition: "icelake"
+                runtime: 10
+            merge_bam_alignment:
+                mem_mb: 20000
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            fix_tags:
+                mem_mb: 13000
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            base_recalibration: 
+                mem_mb: 50000
+                slurm_partition: "icelake-himem"
+                runtime: 10
+            apply_bsqr: 
+                mem_mb: 12000
+                slurm_partition: "icelake-himem"
+                runtime: 10
+                
+        threads:
+            fastq_to_unmapped_bam: 2
+            annotate_bam_with_umis: 15
+            mark_illumina_adapters: 2
+            bwa_input: 1
+            bwa_mem: 15
+            merge_bam_alignment: 2
+            fix_tags: 2
+            mark_duplicates: 2
+            base_recalibration: 2
+            apply_bsqr: 2
+            
+    mutect2:
+        inputs: 
+            sample_bam: "results/aule_preproc-1.0/{seq_type}--{genome_build}/{sample_id}.bam"
+            sample_bai: "results/aule_preproc-1.0/{seq_type}--{genome_build}/{sample_id}.bam.bai"
+            pon: "../mutect2_pon/pon.vcf.gz"   #### PATH TO the Panel-of-normals (Mutect2)
+        resources:
+            mutect2_pileupsummaries: 
+                mem_mb: 25000
+                runtime: 30
+            mutect2_run:
+                runtime: 500
+        pairing_config:
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+                
+    vcf2maf:
+        dirs:
+            _parent: "results/mutect2-2.0_vcf2maf-1.3"
+        inputs:
+            # Available wildcards: {out_dir}, {seq_type}, {genome_build}, {tumour_id}, {normal_id}, {pair_status}, {vcf_name}, {base_name}
+            vep_cache: "../../../reference/downloads/ensembl_vep"
+            sample_vcf_gz: "results/mutect2-2.0/99-outputs/vcf/{seq_type}--{genome_build}/{tumour_id}--{normal_id}--{base_name}.vcf.gz"
+            sample_bam: "results/aule_preproc-1.0/{seq_type}--{genome_build}/{tumour_id}.bam"
+            sample_bai: "results/aule_preproc-1.0/{seq_type}--{genome_build}/{tumour_id}.bam.bai"
+            blacklist_template: "../../../reference/genomes/{genome_build}/encode/encode-blacklist.{genome_build}.bed" 
+            project_base: "/home/jak75/runs/Aule_test/"
+            gamblr_path_to_copy_from: "/home/jak75/src/Aule/GAMBLR/" # PATH TO THE GAMBLR folder in Aule installation folder
+        vcf_base_name: "no_normal.mutect2.combined"
+        options:
+            vcf2maf: "--vcf-tumor-id TUMOR --vcf-normal-id NORMAL --cache-version 105"
+            maf2maf: "--cache-version 105 --species homo_sapiens --retain-cols gnomAD_AF,gnomADg_AF"
+            target_builds: ["hg38"]
+            reference_config: "reference_files.yaml"
+        conda_envs:
+            vcf2maf: "{MODSDIR}/envs/vcf2maf-1.7.0.yaml"
