@@ -13,52 +13,50 @@ lcr-modules:
                 hg38: "data/bed/hg38/panel.bed"
         options:
             mark_duplicates: "--BARCODE_TAG RX --CREATE_INDEX true --MAX_RECORDS_IN_RAM 100000"
-            
+            base_recalibration: "--use-original-qualities --known-sites data/known_sites/Homo_sapiens_assembly38.dbsnp138.tp53.vcf.gz" # This should contain known-sites (eg. Homo_sapiens_assembly38.dbsnp138.vcf, Mills_and_1000G_gold_standard.indels.hg38.vcf.gz, Homo_sapiens_assembly38.known_indels.vcf.gz) for recalibration, we'll skip it for now
+
         resources:
             fastq_to_unmapped_bam: 
                 mem_mb: 13000 
                 slurm_partition: "icelake-himem"
-                runtime: 120
+                runtime: 10
             annotate_bam_with_umis:
                 mem_mb: 100000 
                 slurm_partition: "icelake-himem"
-                runtime: 1000
+                runtime: 10
             mark_duplicates:
                 mem_mb: 90000 
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
             mark_illumina_adapters:
                 mem_mb: 60000 
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
             bwa_input:
                 mem_mb: 2000 
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
             bwa_mem:
                 mem_mb: 45000
                 slurm_partition: "icelake"
-                runtime: 180
+                runtime: 10
             merge_bam_alignment:
                 mem_mb: 20000
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
             fix_tags:
                 mem_mb: 13000
                 slurm_partition: "icelake-himem"
-                runtime: 180
-            mark_duplicates: 
-                mem_mb: 100000
-                slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
+# Removed duplicate mark_duplicates entry
             base_recalibration: 
                 mem_mb: 50000
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
             apply_bsqr: 
                 mem_mb: 12000
                 slurm_partition: "icelake-himem"
-                runtime: 180
+                runtime: 10
                 
         threads:
             fastq_to_unmapped_bam: 2
