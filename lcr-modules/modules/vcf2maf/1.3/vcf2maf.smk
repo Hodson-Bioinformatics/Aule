@@ -221,7 +221,9 @@ rule _vcf2maf_install_GAMBLR:
     shell:
         op.as_one_line("""
         wget -qO {output.config} {params.config_url} &&
-        R -q -e 'options(timeout=9999999); install.packages("{params.gamblrdir}", repos = NULL, type = "source")'
+        R -q -e 'options(timeout=9999999); 
+        install.packages("{params.gamblrdir}", repos = NULL, type = "source");
+        install.packages(c("g3viz", "metaviz"))'
         """)
         # op.as_one_line("""
         # wget -qO {output.config} {params.config_url} &&
