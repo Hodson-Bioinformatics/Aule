@@ -46,7 +46,7 @@ lcr-modules:
       crossmap: "{SCRIPTSDIR}/crossmap/1.1/convert_maf_coords.yaml"
       bcftools: "{MODSDIR}/envs/bcftools-1.10.2.yaml"
       augment_ssm: "{MODSDIR}/envs/augment_ssm-1.1.yaml"
-      gamblr: "{MODSDIR}/envs/gamblr-2.1.yaml"
+      gamblr: "{MODSDIR}/envs/gamblr-2.2.yaml"
 
     threads:
       vcf2maf: 12
