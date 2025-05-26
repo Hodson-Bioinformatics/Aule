@@ -1,7 +1,7 @@
 name: aule_py3.7
 channels:
-  - conda-forge
   - bioconda
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
@@ -22,7 +22,7 @@ dependencies:
   - brotli-python=1.0.9=py37hd23a5d3_7
   - bzip2=1.0.8=hd590300_5
   - c-ares=1.28.1=hd590300_0
-  - ca-certificates=2024.2.2=hbcca054_0
+  - ca-certificates=2025.2.25=h06a4308_0
   - cachetools=5.3.3=pyhd8ed1ab_0
   - certifi=2024.2.2=pyhd8ed1ab_0
   - cffi=1.15.1=py37h43b0acd_1
@@ -38,6 +38,7 @@ dependencies:
   - configargparse=1.7=pyhd8ed1ab_0
   - connection_pool=0.0.3=pyhd3deb0d_0
   - cryptography=38.0.2=py37h5994e8b_1
+  - curl=8.12.1=h251f7ec_0
   - datrie=0.8.2=py37h540881e_4
   - defusedxml=0.7.1=pyhd8ed1ab_0
   - docutils=0.19=py37h89c1867_0
@@ -71,11 +72,15 @@ dependencies:
   - jmespath=1.0.1=pyhd8ed1ab_0
   - jsonschema=4.17.3=pyhd8ed1ab_0
   - jupyter_core=4.11.1=py37h89c1867_0
+  - krb5=1.20.1=h143b758_1
   - ld_impl_linux-64=2.40=h41732ed_0
   - libabseil=20220623.0=cxx17_h05df665_6
   - libblas=3.9.0=21_linux64_openblas
   - libcblas=3.9.0=21_linux64_openblas
   - libcrc32c=1.1.2=h9c3ff4c_0
+  - libcurl=8.12.1=hc9e6f67_0
+  - libedit=3.1.20230828=h5eee18b_0
+  - libev=4.33=h7f8727e_1
   - libffi=3.4.2=h7f98852_5
   - libgcc-ng=13.2.0=h807b86a_5
   - libgfortran-ng=13.2.0=h69a702a_5
@@ -83,14 +88,17 @@ dependencies:
   - libgomp=13.2.0=h807b86a_5
   - liblapack=3.9.0=21_linux64_openblas
   - liblapacke=3.9.0=21_linux64_openblas
+  - libnghttp2=1.57.0=h2d74bed_0
   - libnsl=2.0.1=hd590300_0
   - libopenblas=0.3.26=pthreads_h413a1c8_0
   - libprotobuf=3.21.8=h6239696_0
   - libsodium=1.0.18=h36c2ea0_1
   - libsqlite=3.45.2=h2797004_0
+  - libssh2=1.11.1=h251f7ec_0
   - libstdcxx-ng=13.2.0=h7e041cc_5
   - libzlib=1.2.13=hd590300_5
   - logmuse=0.2.6=pyh8c360ce_0
+  - lz4-c=1.9.4=h6a678d5_1
   - markdown-it-py=2.2.0=pyhd8ed1ab_0
   - markupsafe=2.1.1=py37h540881e_1
   - mdurl=0.1.2=pyhd8ed1ab_0
@@ -155,7 +163,6 @@ dependencies:
   - throttler=1.2.2=pyhd8ed1ab_0
   - tk=8.6.13=noxft_h4845f30_101
   - tomli=2.0.1=pyhd8ed1ab_0
-  - toposort=1.7=pyhd8ed1ab_0
   - traitlets=5.9.0=pyhd8ed1ab_0
   - typing-extensions=4.7.1=hd8ed1ab_0
   - typing_extensions=4.7.1=pyha770c72_0
@@ -172,6 +179,8 @@ dependencies:
   - yte=1.5.4=pyha770c72_0
   - zipp=3.15.0=pyhd8ed1ab_0
   - zlib=1.2.13=hd590300_5
+  - zstd=1.5.2=ha4553b6_0
   - pip:
       - pulp==2.7.0
-prefix: /home/jak75/rds/hpc-work/miniconda3/envs/aule_py3.7
+      - toposort==1.10
+prefix: /home/ilias/miniconda3/envs/aule
