@@ -358,8 +358,8 @@ rule _aule_umi_collapse_consensus_overlap:
         bam = temp(CFG["dirs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.complete.bam"), 
         metrics = CFG["dirs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.metrics.txt"
     log:
-        stdout = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.log",
-        stderr = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.log"
+        stdout = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.stdout.log",
+        stderr = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.stderr.log"
     params:
         tempdir = CFG["scratch_directory"]
     resources: 
