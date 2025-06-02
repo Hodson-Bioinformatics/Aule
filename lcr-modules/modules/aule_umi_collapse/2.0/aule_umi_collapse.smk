@@ -100,7 +100,7 @@ rule _aule_umi_collapse_sortbam_queryname:
         "_aule_umi_collapse_fgbio_set_mate_{sample_id}"
     shell:
         op.as_one_line("""
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java} 
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb} 
         SortBam 
         -i {input.bam} 
         -o {output.bam} 
@@ -129,7 +129,7 @@ rule _aule_umi_collapse_set_mate_info:
         "_aule_umi_collapse_fgbio_set_mate_{sample_id}"
     shell:
         op.as_one_line("""
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java}  
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb}  
         SetMateInformation 
         -i {input.bam} 
         -o {output.bam} 
@@ -159,7 +159,7 @@ rule _aule_umi_collapse_group_by_umi:
         "_aule_umi_collapse_fgbio_collapse_{sample_id}"
     shell:
         op.as_one_line("""
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java} 
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb} 
         GroupReadsByUmi 
         -i {input.bam} 
         -o {output.bam} 
@@ -191,7 +191,7 @@ rule _aule_umi_collapse_sort_coordinates:
         "_aule_umi_collapse_fgbio_collapse_{sample_id}"
     shell:
         op.as_one_line("""
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java} 
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb} 
         SortBam 
         -i {input.bam} 
         -o {output.bam} 
@@ -220,7 +220,7 @@ rule _aule_umi_collapse_consensus_reads:
         "_aule_umi_collapse_fgbio_consensus_{sample_id}"
     shell:
         op.as_one_line("""
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java} 
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb} 
         CallMolecularConsensusReads 
         -i {input.bam} 
         -o {output.ubam} 
@@ -297,7 +297,7 @@ rule _aule_umi_collapse_ubam_sort_queryname:
         stdout = CFG["logs"]["bwa"] + "{seq_type}--{genome_build}/{sample_id}.merge_bam_alignment.sort_queryname.log",
         stderr = CFG["logs"]["bwa"] + "{seq_type}--{genome_build}/{sample_id}.merge_bam_alignment.sort_queryname.stderr.log"
     resources: 
-        **CFG["resources"]["bwa_mem"]
+        **CFG["resources"]["sortbam_queryname"]
     conda:
         CFG["conda_envs"]["picard"]
     params:
@@ -306,7 +306,7 @@ rule _aule_umi_collapse_ubam_sort_queryname:
         "_aule_umi_collapse_bwa_{sample_id}"
     shell:
         op.as_one_line("""
-        picard SortSam {resources.mem_mb_java} 
+        picard SortSam {resources.mem_mb}
         --TMP_DIR {params.tempdir}
         -I {input.ubam} 
         -O {output.ubam} 
@@ -358,8 +358,8 @@ rule _aule_umi_collapse_consensus_overlap:
         bam = temp(CFG["dirs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.complete.bam"), 
         metrics = CFG["dirs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.metrics.txt"
     log:
-        stdout = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.log",
-        stderr = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.log"
+        stdout = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.stdout.log",
+        stderr = CFG["logs"]["consensus_overlap"] + "{seq_type}--{genome_build}/{sample_id}.consensus_overlap.stderr.log"
     params:
         tempdir = CFG["scratch_directory"]
     resources: 
@@ -371,7 +371,7 @@ rule _aule_umi_collapse_consensus_overlap:
     shell:
         op.as_one_line("""
         samtools sort -n -u {input.bam} | 
-        fgbio --tmp-dir={params.tempdir} {resources.mem_mb_java} 
+        fgbio --tmp-dir={params.tempdir} {resources.mem_mb} 
         CallOverlappingConsensusBases 
         -i /dev/stdin
         -o {output.bam} 
@@ -403,7 +403,7 @@ rule _aule_umi_collapse_sort_final:
         "_aule_umi_collapse_postproc_{sample_id}"
     shell:
         op.as_one_line("""
-        picard SortSam {resources.mem_mb_java}
+        picard SortSam {resources.mem_mb}
         --TMP_DIR {params.tempdir}
         -I {input.bam}
         -O {output.bam}
