@@ -111,11 +111,7 @@ rule _ichorcna_input_pon:
     input:
         pon = CFG["inputs"]["ichorcna_pon"]
     output:
-<<<<<<< HEAD
-        pon = CFG["dirs"]["inputs"] + "pon/{seq_type}--{genome_build}/bin{binSize}kb/ichorcna_pon.rds"
-=======
         pon = CFG["dirs"]["inputs"] + "pon/{seq_type}--{genome_build}/bin{binSize}kb/ichorCNA_PON_{genome_build}_bin{binSize}_full_median.rds"
->>>>>>> main
     run:
         op.absolute_symlink(input.pon, output.pon)
 
@@ -125,24 +121,16 @@ rule _ichorcna_bamCoverage:
     input:
         bam = str(rules._ichorcna_input_bam.output.bam)
     output:
-<<<<<<< HEAD
-        bw = temp(CFG["dirs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.bw")
-    params:
-        binSize = "{binSize}",
-=======
         bw = CFG["dirs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.bw"
     params:
->>>>>>> main
+         binSize = "{binSize}",
         opts = CFG["options"]["bamCoverage"]
     conda: 
         CFG["conda_envs"]["bamCoverage"]
     threads: 
         CFG["threads"]["bamCoverage"]
-<<<<<<< HEAD
-=======
     group:
         "_ichorcna_bigWig_{tumour_id}"
->>>>>>> main
     resources:
         **CFG["resources"]["bamCoverage"]
     wildcard_constraints: 
@@ -151,11 +139,7 @@ rule _ichorcna_bamCoverage:
         CFG["logs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.log"
     shell:
         """
-<<<<<<< HEAD
             bamCoverage -b {input.bam} --binSize {params.binSize}000 {params.opts} -o {output.bw} -p {threads}
-=======
-            bamCoverage -b {input.bam} --binSize {wildcards.binSize}000 {params.opts} -o {output.bw} -p {threads}
->>>>>>> main
         """
 
 
@@ -171,11 +155,8 @@ rule _ichorcna_bigwigToWig:
         CFG["threads"]["bigwigToWig"]
     resources:
         **CFG["resources"]["bigwigToWig"]
-<<<<<<< HEAD
-=======
     group:
         "_ichorcna_Wig_{tumour_id}_{binSize}"
->>>>>>> main
     wildcard_constraints: 
         binSize = "|".join(["10", "50", "500", "1000"]),
         chrom = ".+(?<!--fixed)"
@@ -199,11 +180,8 @@ rule _ichorcna_convert_wig:
         CFG["threads"]["convert_wig"]
     resources:
         **CFG["resources"]["convert_wig"]
-<<<<<<< HEAD
-=======
     group:
         "_ichorcna_Wig_{tumour_id}_{binSize}"
->>>>>>> main
     wildcard_constraints:
         binSize = "|".join(["10", "50", "500", "1000"]),
         chrom = ".+(?<!--fixed)"
@@ -232,15 +210,11 @@ rule _ichorcna_compile_wigs:
     input:
         wigs = get_chrom_wigs
     output:
-<<<<<<< HEAD
-        wig = temp(CFG["dirs"]["compile_wigs"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.wig")
-=======
         wig = CFG["dirs"]["compile_wigs"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.wig"
     resources:
         **CFG["resources"]["compile_wigs"]
     group:
         "_ichorcna_run_{tumour_id}"
->>>>>>> main
     shell:
         """
             cat {input.wigs} > {output.wig}
@@ -280,10 +254,7 @@ rule _ichorcna_ichorcna_run:
         centromere = get_centromere,
         exome = CFG["options"]["ichorcna_run"]["exome"],
         genomeStyle = op.switch_on_wildcard("genome_build", CFG["options"]["ichorcna_run"]["genomeStyle"]),
-<<<<<<< HEAD
-=======
         genomeBuild = "{genome_build}",
->>>>>>> main
         opts = CFG["options"]["ichorcna_run"]["opts"]
     conda: 
         CFG["conda_envs"]["ichorcna_run"]
@@ -291,11 +262,8 @@ rule _ichorcna_ichorcna_run:
         CFG["threads"]["ichorcna_run"]
     resources:
         **CFG["resources"]["ichorcna_run"]
-<<<<<<< HEAD
-=======
     group:
         "_ichorcna_run_{tumour_id}"
->>>>>>> main
     wildcard_constraints: 
         binSize = "|".join(["10", "50", "500", "1000"])
     log:
@@ -311,10 +279,7 @@ rule _ichorcna_ichorcna_run:
             --normalPanel {input.pon}
             --exons.bed {params.exome}
             --genomeStyle {params.genomeStyle} 
-<<<<<<< HEAD
-=======
             --genomeBuild {params.genomeBuild}
->>>>>>> main
             --centromere {params.centromere} 
             --outDir {params.outDir} 
             {params.opts}
@@ -357,12 +322,8 @@ rule _ichorcna_all:
                 str(rules._ichorcna_output.output.cna),
                 str(rules._ichorcna_output.output.seg_txt),
                 str(rules._ichorcna_output.output.seg),
-<<<<<<< HEAD
-                str(rules._ichorcna_output.output.plot)
-=======
                 str(rules._ichorcna_output.output.plot),
                 str(rules._ichorcna_compile_wigs.output.wig)
->>>>>>> main
             ],
             zip,  # Run expand() with zip(), not product()
             seq_type=CFG["runs"]["tumour_seq_type"],
