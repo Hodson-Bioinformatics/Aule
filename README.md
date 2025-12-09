@@ -19,19 +19,37 @@ AULE addresses critical challenges in ctDNA analysis for lymphoma monitoring:
 - **Open science**  - Fully reproducible with documented methods, version control and open codebase.
 - **Modular design** - Flexible execution of individual modules or end-to-end workflows, adaptable to already existing workflows
 
-## 📒 AULE usage 
+### 📒 AULE usage 
 
 Learn more on [AULE wiki](https://github.com/Hodson-Bioinformatics/Aule/wiki) 
 
-#### ⚡️ Quick links
+### 🎯 AULE in action
 
-[Installation](https://github.com/Hodson-Bioinformatics/Aule/wiki/Installation)  
-[AULE architecture and an example workflow](https://github.com/Hodson-Bioinformatics/Aule/wiki/Architecture-and-basic-workflow)  
-[How to setup your first AULE run](https://github.com/Hodson-Bioinformatics/Aule/wiki/Typical-run-setup)  
+AULE has been used in the following research studies:
 
-## 🎯 AULE in action
+- **Krupka et al. (2025)** - [*The DIRECT study: A roadmap for ctDNA-based risk prediction, molecular profiling and MRD detection in Diffuse Large B Cell Lymphoma*](https://www.medrxiv.org/content/10.1101/2025.04.14.25325806v1) - The primary publication, where AULE was developed and applied to a large cohort of LBCL patients in the DIRECT clinical trial 
 
-[DIRECT trial](https://cctu.org.uk/portfolio/cancer/trials-closed-to-recruitment-in-follow-up/direct) - a multisite prospective molecular profiling trial of patients undergoing first-line therapy for aggressive B-cell Non-Hodgkin lymphoma, see our [preprint](https://doi.org/10.1101/2025.04.14.25325806) on MedRxiv
+### 📖 Citing AULE:
+
+If you use AULE in your research, please cite:
+
+```
+   @article{krupka2025direct, 
+   year     = {2025}, 
+   title    = {The {DIRECT} study: A roadmap for {ctDNA}-based risk prediction, molecular profiling and {MRD} detection in Diffuse Large B Cell Lymphoma}, 
+   author   = {Krupka, Joanna A and Moutsopoulos, Ilias and Cutmore, Natasha H ... and  Hodson, Daniel J}, 
+   journal  = {{medRxiv}}, 
+   doi      = {10.1101/2025.04.14.25325806}, 
+   pages    = {2025.04.14.25325806}
+   }
+```
+
+### 🧙‍♂️ About the Name: Aulë
+
+**Aulë the Smith** is one of the Valar (gods) in J.R.R. Tolkien's Middle-earth legendarium. Known as the master craftsman and smith, Aulë created the Dwarves and was renowned for his skill in working with metals, stone, and gems. He was particularly associated with **crafting, precision, and creating tools** that would endure through time.
+
+*"But the delight and pride of Aulë is in the deed of making, and in the thing made, and neither in possession nor in his own mastery"*  
+— The Silmarillion
 
 ## 💪 Contributors 
 
