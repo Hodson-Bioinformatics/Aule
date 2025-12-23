@@ -27,21 +27,27 @@ Learn more on [AULE wiki](https://github.com/Hodson-Bioinformatics/Aule/wiki)
 
 AULE has been used in the following research studies:
 
-- **Krupka et al. (2025)** - [*The DIRECT study: A roadmap for ctDNA-based risk prediction, molecular profiling and MRD detection in Diffuse Large B Cell Lymphoma*](https://www.medrxiv.org/content/10.1101/2025.04.14.25325806v1) - The primary publication, where AULE was developed and applied to a large cohort of LBCL patients in the DIRECT clinical trial 
+- **Krupka et al. (2025)** - [*Phased Variant–Supported Circulating Tumor DNA as a Prognostic Biomarker After First-Line Treatment in Large B-Cell Lymphoma: Findings From the DIRECT Study*](https://ascopubs.org/doi/10.1200/JCO-25-01587) - The primary publication in which AULE was developed and applied to a large cohort of LBCL patients, and used for phased variant–supported MRD analysis.
+- **Krupka et al. (2025)** - [*The DIRECT study: A roadmap for ctDNA-based risk prediction, molecular profiling and MRD detection in Diffuse Large B Cell Lymphoma*](https://www.medrxiv.org/content/10.1101/2025.04.14.25325806v1) - The initial preprint
 
 ### 📖 Citing AULE:
 
 If you use AULE in your research, please cite:
 
 ```
-   @article{krupka2025direct, 
-   year     = {2025}, 
-   title    = {The {DIRECT} study: A roadmap for {ctDNA}-based risk prediction, molecular profiling and {MRD} detection in Diffuse Large B Cell Lymphoma}, 
-   author   = {Krupka, Joanna A and Moutsopoulos, Ilias and Cutmore, Natasha H ... and  Hodson, Daniel J}, 
-   journal  = {{medRxiv}}, 
-   doi      = {10.1101/2025.04.14.25325806}, 
-   pages    = {2025.04.14.25325806}
-   }
+@article{doi:10.1200/JCO-25-01587,
+author = {Krupka, Joanna A. and Moutsopoulos, Ilias and Cutmore, Natasha H. and Trethewey, Christopher S. and Dayimu, Alimu and Goodhew, Rebecca and Kaji, Furqaan and Raso-Barnett, Livia and Cheow, Heok and Elzubeir, Lee and Smith, Julie and Kamil, Anver and Barbara, Ramona-Rita and Price, Jane and Elston, Kay and Kolodziejczyk, Aleksandra and Tarantino, Silvia and Mariscotti, Fabiana and Barry, Philip and Frost, Steven and Demiris, Nikolaos and Thomas, Martin G. and Hassane, Duane and Munugalavadla, Veerendra and Nagumantry, Sateesh Kumar and Karanth, Mamatha J. and Ahearne, Matthew and Shah, Nimish and Fox, Christopher P. and Anand, Shubha and Hodson, Daniel J. },
+title = {Phased Variant–Supported Circulating Tumor DNA as a Prognostic Biomarker After First-Line Treatment in Large B-Cell Lymphoma: Findings From the DIRECT Study},
+journal = {Journal of Clinical Oncology},
+volume = {0},
+number = {0},
+pages = {JCO-25-01587},
+year = {},
+doi = {10.1200/JCO-25-01587},
+note ={PMID: 41428995},
+URL = {https://ascopubs.org/doi/abs/10.1200/JCO-25-01587}
+}
+
 ```
 
 ### 🧙‍♂️ About the Name: Aulë
