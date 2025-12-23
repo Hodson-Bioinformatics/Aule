@@ -27,7 +27,7 @@ Learn more on [AULE wiki](https://github.com/Hodson-Bioinformatics/Aule/wiki)
 
 AULE has been used in the following research studies:
 
-- **Krupka et al. (2025)** - [*Phased Variant–Supported Circulating Tumor DNA as a Prognostic Biomarker After First-Line Treatment in Large B-Cell Lymphoma: Findings From the DIRECT Study*](https://ascopubs.org/doi/10.1200/JCO-25-01587) - The primary publication in which AULE was developed and applied to a large cohort of LBCL patients, and used for phased variant–supported MRD analysis.
+- **Krupka et al. JCO (2025)** - [*Phased Variant–Supported Circulating Tumor DNA as a Prognostic Biomarker After First-Line Treatment in Large B-Cell Lymphoma: Findings From the DIRECT Study*](https://ascopubs.org/doi/10.1200/JCO-25-01587) - The primary publication in which AULE was developed and applied to a large cohort of LBCL patients, and used for phased variant–supported MRD analysis.
 - **Krupka et al. (2025)** - [*The DIRECT study: A roadmap for ctDNA-based risk prediction, molecular profiling and MRD detection in Diffuse Large B Cell Lymphoma*](https://www.medrxiv.org/content/10.1101/2025.04.14.25325806v1) - The initial preprint
 
 ### 📖 Citing AULE:
