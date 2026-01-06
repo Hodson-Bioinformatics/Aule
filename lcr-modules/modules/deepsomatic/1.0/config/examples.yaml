@@ -1,0 +1,91 @@
+# Example configuration for DeepSomatic module
+# This file demonstrates how to configure the DeepSomatic module for different use cases
+
+lcr-modules:
+  deepsomatic:
+    
+    # Example 1: Matched tumor-normal WES analysis
+    inputs:
+      sample_bam: "results/bam/{sample_id}.tumor.bam"
+      sample_bai: "results/bam/{sample_id}.tumor.bam.bai"  
+      normal_bam: "results/bam/{sample_id}.normal.bam"
+      normal_bai: "results/bam/{sample_id}.normal.bam.bai"
+
+    options:
+      # Use FFPE-optimized models for better performance on FFPE samples
+      model_type_matched:
+        capture: "FFPE_WES"
+        genome: "FFPE_WGS"
+      
+      # Optional: restrict analysis to specific chromosomes or regions
+      regions:
+        capture: "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY"
+      
+      # Additional DeepSomatic arguments for matched mode
+      deepsomatic_matched: "--min_mapping_quality=20 --min_base_quality=10"
+
+    # Resource allocation (adjust based on your system)
+    threads:
+      deepsomatic_run: 16
+    
+    resources:
+      deepsomatic_run:
+        mem_mb: 64000
+        disk_mb: 100000
+
+---
+
+# Example 2: Tumor-only mode configuration
+lcr-modules:
+  deepsomatic:
+    
+    inputs:
+      sample_bam: "results/bam/{sample_id}.tumor.bam"
+      sample_bai: "results/bam/{sample_id}.tumor.bam.bai"
+      # Leave normal BAM paths empty for tumor-only mode
+      normal_bam: ""
+      normal_bai: ""
+
+    options:
+      # Use tumor-only specific models
+      model_type_tumor_only:
+        capture: "FFPE_WES_TUMOR_ONLY"
+        genome: "FFPE_WGS_TUMOR_ONLY"
+      
+      # Enable default PON filtering to remove germline variants
+      use_default_pon_filtering: "true"
+      
+      # Additional arguments for tumor-only mode
+      deepsomatic_tumor_only: "--population_vcfs=custom_germline.vcf.gz"
+
+---
+
+# Example 3: High-throughput configuration with custom regions
+lcr-modules:
+  deepsomatic:
+    
+    inputs:
+      sample_bam: "results/bam/{sample_id}.tumor.bam"
+      sample_bai: "results/bam/{sample_id}.tumor.bam.bai"
+      normal_bam: "results/bam/{sample_id}.normal.bam"
+      normal_bai: "results/bam/{sample_id}.normal.bam.bai"
+
+    options:
+      # Use specific Docker image version (Snakemake container format)
+      docker_image: "docker://google/deepsomatic:1.9.0"
+      
+      # Target specific exonic regions
+      regions:
+        capture: "1:1000000-2000000,2:3000000-4000000"
+      
+      # Optimize for high-throughput processing
+      deepsomatic_matched: "--use_quick_mode=true --min_mapping_quality=30"
+
+    # High-performance settings
+    threads:
+      deepsomatic_run: 32
+    
+    resources:
+      deepsomatic_run:
+        mem_mb: 128000
+        disk_mb: 200000
