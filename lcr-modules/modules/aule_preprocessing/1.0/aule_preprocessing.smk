@@ -288,7 +288,8 @@ rule _aule_preprocessing_mark_duplicates:
         stderr = CFG["logs"]["mark_duplicates"] + "{seq_type}--{genome_build}/{sample_id}.mark_duplicates.stderr.log"
     params:
         options = CFG["options"]["mark_duplicates"],
-        java = CFG["options"]["java_gatk"]
+        java = CFG["options"]["java_gatk"],
+        scratch = CFG["scratch_directory"]     
     conda:
         CFG["conda_envs"]["gatk"]
     threads:
@@ -301,6 +302,7 @@ rule _aule_preprocessing_mark_duplicates:
        --INPUT {input.bam}
        --OUTPUT {output.bam}
        --METRICS_FILE {log.metrics}
+       --TMP_DIR {params.scratch} 
        {params.options}
         > {log.stdout} 2> {log.stderr}
         """)
@@ -317,7 +319,8 @@ rule _aule_preprocessing_base_recalibraton:
         stdout = CFG["logs"]["base_recalibration"] + "{seq_type}--{genome_build}/{sample_id}.base_recalibration.stdout.log",
         stderr = CFG["logs"]["base_recalibration"] + "{seq_type}--{genome_build}/{sample_id}.base_recalibration.stderr.log"
     params:
-        options = CFG["options"]["base_recalibration"]
+        options = CFG["options"]["base_recalibration"],
+        scratch = CFG["scratch_directory"]     
     conda:
         CFG["conda_envs"]["gatk"]
     threads:
@@ -330,7 +333,8 @@ rule _aule_preprocessing_base_recalibraton:
         -R {input.ref} 
         -I {input.bam} 
         -L {input.region} 
-        -O {output.recalibration}
+        -O {output.recalibration} 
+        --tmp-dir {params.scratch} 
         {params.options}
          > {log.stdout} 2> {log.stderr}
         """)

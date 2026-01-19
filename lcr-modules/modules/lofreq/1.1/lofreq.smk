@@ -213,17 +213,22 @@ rule _lofreq_run_tumour_unmatched:
     wildcard_constraints: 
         pair_status = "unmatched" 
     shell:
-        op.as_one_line("""
-        SCRIPT_PATH={SCRIPT_PATH};
-        PATH=$SCRIPT_PATH:$PATH;
-        SCRIPT="$SCRIPT_PATH/lofreq2_call_pparallel.py";
-        if [[ $(which lofreq2_call_pparallel.py) =~ $SCRIPT ]]; then 
-            echo "using bundled patched script $SCRIPT";
-            lofreq somatic {params.opts} --threads {threads} -t {input.tumour_bam} -n {input.normal_bam}
-            -f {input.fasta} -o $(dirname {output.vcf_snvs_filtered})/ -d {input.dbsnp} --bed {input.bed}
-            > {log.stdout} 2> {log.stderr};
-        else echo "WARNING: PATH is not set properly, using $(which lofreq2_call_pparallel.py)"; fi
-        """) ### modified - removed --continue option
+      op.as_one_line("""
+      lofreq somatic {params.opts} --threads {threads} -t {input.tumour_bam} -n {input.normal_bam}
+        -f {input.fasta} -o $(dirname {output.vcf_snvs_filtered})/ -d {input.dbsnp} --bed {input.bed}
+        > {log.stdout} 2> {log.stderr}
+      """)
+        # op.as_one_line("""
+        # SCRIPT_PATH={SCRIPT_PATH};
+        # PATH=$SCRIPT_PATH:$PATH;
+        # SCRIPT="$SCRIPT_PATH/lofreq2_call_pparallel.py";
+        # if [[ $(which lofreq2_call_pparallel.py) =~ $SCRIPT ]]; then 
+        #     echo "using bundled patched script $SCRIPT";
+        #     lofreq somatic {params.opts} --threads {threads} -t {input.tumour_bam} -n {input.normal_bam}
+        #     -f {input.fasta} -o $(dirname {output.vcf_snvs_filtered})/ -d {input.dbsnp} --bed {input.bed}
+        #     > {log.stdout} 2> {log.stderr};
+        # else echo "WARNING: PATH is not set properly, using $(which lofreq2_call_pparallel.py)"; fi
+        # """) ### modified - removed --continue option
 
 rule _lofreq_run_tumour_matched:
     input:
