@@ -1,0 +1,68 @@
+lcr-modules:
+    
+    deepsomatic:
+
+        inputs:
+            # Available wildcards: {sample_id}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+            # Optional for tumor-only mode (set to "" if not available)
+            normal_bam: "__UPDATE__"
+            normal_bai: "__UPDATE__"
+
+        scratch_subdirectories: ["deepsomatic"]
+
+        options:
+            # Docker image for DeepSomatic (Snakemake container format)
+            docker_image: "docker://google/deepsomatic:1.9.0"
+            
+            # Model types for different sequencing types
+            model_type_matched:
+                genome: "FFPE_WGS"
+                capture: "FFPE_WES"
+                mrna: "FFPE_WES"
+            model_type_tumor_only:
+                genome: "FFPE_WGS_TUMOR_ONLY"
+                capture: "FFPE_WES_TUMOR_ONLY"
+                mrna: "FFPE_WES_TUMOR_ONLY"
+            
+            # DeepSomatic specific options
+            use_default_pon_filtering: "true"
+            
+            # Regions to analyze (optional)
+            regions:
+                genome: ""
+                capture: ""
+                mrna: ""
+            
+            # Additional arguments for matched mode
+            deepsomatic_matched: ""
+            
+            # Additional arguments for tumor-only mode  
+            deepsomatic_tumor_only: ""
+
+        conda_envs:
+            deepsomatic: "{MODSDIR}/envs/deepsomatic/deepsomatic-1.9.0.yaml"
+            
+        threads:
+            deepsomatic_run: 8
+
+        resources:
+            deepsomatic_run:
+                mem_mb: 32000
+                disk_mb: 50000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: False
+
+        # Sample mode configuration (matched vs tumor_only)
+        sample_modes:
+            matched: ["matched"]
+            tumor_only: ["tumor_only"]

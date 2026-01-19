@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - python=3.8
+  # Minimal environment since DeepSomatic runs in Docker container
+  # Snakemake handles Docker integration automatically
