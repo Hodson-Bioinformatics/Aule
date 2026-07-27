@@ -1,0 +1,10 @@
+name: null
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base>=4.0
+  - r-pdftools
+  - r-png
+  - r-gridextra

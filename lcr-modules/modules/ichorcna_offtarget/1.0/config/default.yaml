@@ -1,0 +1,82 @@
+lcr-modules:
+
+    ichorcna_offtarget:
+
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {binSize} (pon only)
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+            ichorcna_pon: "__UPDATE__"  # output of ichorcna_pon_offtarget module, or a PON from ichorCNA package
+            # BED file with panel regions to exclude (e.g. panel + 2 kb flanks, collapsed)
+            panel_bed: "__UPDATE__"
+
+        scratch_subdirectories: []
+
+        options:
+            ichorcna_branch: "master"
+            # bin size in kilobases; has to be one of 10, 50, 500, 1000
+            binsize_kb: 1000
+            bamCoverage: "--ignoreDuplicates --extendReads"
+            ichorcna_run:
+                # use bed file if sample has targeted regions, eg. exome data (optional)
+                exome: NULL
+                genome_ucsc:
+                    grch37: "hg19"
+                    grch38: "hg38"
+                    hg19: "hg19"
+                    hg38: "hg38"
+                centromere:
+                    grch37: "GRCh37.p13_centromere_UCSC-gapTable.txt"
+                    grch38: "GRCh38.GCA_000001405.2_centromere_acen.txt"
+                    hg19: "GRCh37.p13_centromere_UCSC-gapTable.txt"
+                    hg38: "GRCh38.GCA_000001405.2_centromere_acen.txt"
+                genomeStyle:
+                    grch37: "NCBI"
+                    grch38: "NCBI"
+                    hg19: "UCSC"
+                    hg38: "UCSC"
+                opts:
+                    "--ploidy 'c(2,3,4)' --normal 'c(0.5,0.6,0.7,0.8,0.9,0.95)' --txnE 0.9999"
+
+        conda_envs:
+            offtarget_bam: "{MODSDIR}/envs/samtools-bedtools.yaml"
+            bamCoverage: "{MODSDIR}/envs/deeptools.env.yaml"
+            bigwigToWig: "{MODSDIR}/envs/ucsc-bigwigtowig.env.yaml"
+            convert_wig: "{MODSDIR}/envs/bedops_tools.env.yaml"
+            ichorcna_run: "{MODSDIR}/envs/ichorcna-0.2.0.yaml"
+
+        threads:
+            offtarget_bam: 4
+            bamCoverage: 20
+            bigwigToWig: 1
+            convert_wig: 1
+            ichorcna_run: 4
+
+        resources:
+            offtarget_bam:
+                mem_mb: 8000
+                bam: 1
+            bamCoverage:
+                mem_mb: 40000
+                bam: 1
+            bigwigToWig:
+                mem_mb: 6000
+                bam: 1
+            convert_wig:
+                mem_mb: 6000
+                bam: 1
+            ichorcna_run:
+                mem_mb: 6000
+                bam: 1
+            compile_wigs:
+                mem_mb: 2000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True

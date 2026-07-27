@@ -1,0 +1,8 @@
+name: null
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bedops=2.4.39
+  - bedtools>=2.29
