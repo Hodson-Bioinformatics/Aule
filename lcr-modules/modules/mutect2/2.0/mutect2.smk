@@ -201,7 +201,8 @@ rule _mutect2_run_matched_unmatched:
         mem_mb = lambda wildcards, resources: int(resources.mem_mb * 0.8), 
         opts = CFG["options"]["mutect2_run"], 
         interval_arg = _mutect2_get_interval_cli_arg(),
-        pon = CFG["inputs"]["pon"]
+        pon = CFG["inputs"]["pon"],
+        tmpdir = CFG["scratch_directory"]
     conda:
         CFG["conda_envs"]["gatk"]
     threads:
@@ -210,7 +211,7 @@ rule _mutect2_run_matched_unmatched:
         pair_status = "matched|unmatched"
     shell:
         op.as_one_line("""
-        gatk Mutect2 --java-options "-Xmx{params.mem_mb}m" {params.opts} 
+        gatk Mutect2 --java-options "-Xmx{params.mem_mb}m -Djava.io.tmpdir={params.tmpdir}" {params.opts} 
         -I {input.tumour_bam} -I {input.normal_bam}
         -R {input.fasta} -normal "$(cat {input.normal_sm})" -O {output.vcf}
         --germline-resource {input.gnomad} 
