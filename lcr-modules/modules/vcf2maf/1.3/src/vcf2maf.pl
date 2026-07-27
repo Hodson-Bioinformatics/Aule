@@ -477,6 +477,10 @@ unless( $inhibit_vep ) {
     $vep_cmd .= " --check_allele" unless( $any_allele or $vep_script =~ m/vep$/ );
     # Add --cache-version only if the user specifically asked for a version
     $vep_cmd .= " --cache_version $cache_version" if( $cache_version );
+    # Add Alpha missence plugin
+    
+    $vep_cmd .= " --dir_plugins ../../../reference/downloads/vep_plugins" ;
+    $vep_cmd .= " --plugin AlphaMissense,file=../../../reference/AlphaMissense/AlphaMissense_hg38.tsv.gz" ;
     # Add options that only work on human variants
     if( $species eq "homo_sapiens" ) {
         # Slight change in options if in offline mode, or if using the newer VEP
