@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------- #
 
 # Original snakemake author: Jasper Wong
-# Module author: Ilias Moutsopoulos & Joanna Krupka & Rebecca Goodhew
+# Module author: Joanna A. Krupka
 # Additional contributors: N/A
 
 
@@ -27,8 +27,6 @@ try:
 except ModuleNotFoundError:
     sys.exit("The packaging module dependency is missing. Please install it ('pip install packaging') and ensure you are using the most up-to-date oncopipe version")
 
-# To avoid this we need to add the "packaging" module as a dependency for LCR-modules or oncopipe
-
 current_version = pkg_resources.get_distribution("oncopipe").version
 if version.parse(current_version) < version.parse(min_oncopipe_version):
     logger.warning(
@@ -37,27 +35,26 @@ if version.parse(current_version) < version.parse(min_oncopipe_version):
                 )
     sys.exit("Instructions for updating to the current version of oncopipe are available at https://lcr-modules.readthedocs.io/en/latest/ (use option 2)")
 
-# End of dependency checking section 
+# End of dependency checking section
 
 ### Directories ###
 # Setup module and store module-specific configuration in `CFG`.
 CFG = op.setup_module(
-    name = "ichorcna", 
-    version = "2.0",
-    subdirectories = ["inputs", "bamCoverage", "bigwigToWig", "convert_wig", "compile_wigs", "ichorcna_run", "outputs"]
+    name = "ichorcna_offtarget",
+    version = "1.0",
+    subdirectories = ["inputs", "offtarget_bam", "bamCoverage", "bigwigToWig", "convert_wig", "compile_wigs", "ichorcna_run", "outputs"]
 )
 
 localrules:
-    _ichorcna_input_bam,
-    _ichorcna_input_pon,
-    _ichorcna_output,
-    _ichorcna_all
+    _ichorcna_offtarget_input_bam,
+    _ichorcna_offtarget_input_pon,
+    _ichorcna_offtarget_output,
+    _ichorcna_offtarget_all
 
 # ---------------------------------------------------------------------------- #
 ##### RULES #####
 # ---------------------------------------------------------------------------- #
 
-# This defines the script/extdata directory used by ichorCNA in the subsequent rules:
 # Obtain the path to the ichorCNA conda environment
 md5hash = hashlib.md5()
 if workflow.conda_prefix:
@@ -71,12 +68,12 @@ md5hash.update(f.read())
 f.close()
 h = md5hash.hexdigest()
 
-ichorcna_env = conda_prefix + "/" + h + "_" 
+ichorcna_env = conda_prefix + "/" + h + "_"
 ichorcna_dir = ichorcna_env + "/ichorCNA"
 ichorcna_scripts_dir = conda_prefix + "/" + h + "_" + "/ichorCNA/scripts/"
 
 
-rule _ichorcna_install_ichorcna:
+rule _ichorcna_offtarget_install_ichorcna:
     params:
         branch = CFG['options']['ichorcna_branch'],
         directory = ichorcna_dir,
@@ -98,7 +95,7 @@ rule _ichorcna_install_ichorcna:
 
 
 # Symlinks the input files into the module results directory (under '00-inputs/')
-rule _ichorcna_input_bam:
+rule _ichorcna_offtarget_input_bam:
     input:
         bam = CFG["inputs"]["sample_bam"],
         bai = CFG["inputs"]["sample_bai"]
@@ -110,7 +107,7 @@ rule _ichorcna_input_bam:
         op.absolute_symlink(input.bai, output.bai)
 
 
-rule _ichorcna_input_pon:
+rule _ichorcna_offtarget_input_pon:
     input:
         pon = CFG["inputs"]["ichorcna_pon"]
     output:
@@ -119,24 +116,46 @@ rule _ichorcna_input_pon:
         op.absolute_symlink(input.pon, output.pon)
 
 
-# deeptools to get .bw from .bam
-rule _ichorcna_bamCoverage:
+# Exclude on-target panel regions with bedtools intersect -v, producing a temporary off-target BAM
+rule _ichorcna_offtarget_exclude_panel:
     input:
-        bam = str(rules._ichorcna_input_bam.output.bam)
+        bam = str(rules._ichorcna_offtarget_input_bam.output.bam),
+        bed = CFG["inputs"]["panel_bed"]
+    output:
+        bam = temp(CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.bam"),
+        bai = temp(CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.bam.bai")
+    conda:
+        CFG["conda_envs"]["offtarget_bam"]
+    threads:
+        CFG["threads"]["offtarget_bam"]
+    resources:
+        **CFG["resources"]["offtarget_bam"]
+    log:
+        CFG["logs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.log"
+    shell:
+        op.as_one_line("""
+        bedtools intersect -abam {input.bam} -b {input.bed} -v > {output.bam} 2>> {log} &&
+        samtools index {output.bam} 2>> {log}
+        """)
+
+
+# deeptools to get .bw from off-target .bam
+rule _ichorcna_offtarget_bamCoverage:
+    input:
+        bam = str(rules._ichorcna_offtarget_exclude_panel.output.bam),
+        bai = str(rules._ichorcna_offtarget_exclude_panel.output.bai)
     output:
         bw = CFG["dirs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.bw"
     params:
         binSize = "{binSize}",
         opts = CFG["options"]["bamCoverage"]
-    conda: 
+    conda:
         CFG["conda_envs"]["bamCoverage"]
-    threads: 
+    threads:
         CFG["threads"]["bamCoverage"]
-    group:
-        "_ichorcna_bigWig_{tumour_id}"
     resources:
         **CFG["resources"]["bamCoverage"]
-    wildcard_constraints: 
+    wildcard_constraints:
         binSize = "|".join(["10", "50", "500", "1000"])
     log:
         CFG["logs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.log"
@@ -147,44 +166,40 @@ rule _ichorcna_bamCoverage:
 
 
 # Converts bigWig to Wig
-rule _ichorcna_bigwigToWig:
+rule _ichorcna_offtarget_bigwigToWig:
     input:
-        bw = str(rules._ichorcna_bamCoverage.output.bw)
+        bw = str(rules._ichorcna_offtarget_bamCoverage.output.bw)
     output:
         wig = temp(CFG["dirs"]["bigwigToWig"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb_{chrom}.wig")
-    conda: 
+    conda:
         CFG["conda_envs"]["bigwigToWig"]
-    threads: 
+    threads:
         CFG["threads"]["bigwigToWig"]
     resources:
         **CFG["resources"]["bigwigToWig"]
-    group:
-        "_ichorcna_Wig_{tumour_id}_{binSize}"
-    wildcard_constraints: 
+    wildcard_constraints:
         binSize = "|".join(["10", "50", "500", "1000"]),
         chrom = ".+(?<!--fixed)"
     log:
         CFG["logs"]["bigwigToWig"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb_{chrom}.log"
     shell:
         """
-            bigWigToWig {input.bw} {output.wig} -chrom={wildcards.chrom} 
+            bigWigToWig {input.bw} {output.wig} -chrom={wildcards.chrom}
         """
 
 
-# This function will reformat the wig file to one that can be used for ichorCNA
-rule _ichorcna_convert_wig:
+# Reformat wig to fixed-step format required by ichorCNA
+rule _ichorcna_offtarget_convert_wig:
     input:
-        wig = str(rules._ichorcna_bigwigToWig.output.wig)
+        wig = str(rules._ichorcna_offtarget_bigwigToWig.output.wig)
     output:
         wig = temp(CFG["dirs"]["convert_wig"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.{chrom}--fixed.wig")
-    conda: 
+    conda:
         CFG["conda_envs"]["convert_wig"]
-    threads: 
+    threads:
         CFG["threads"]["convert_wig"]
     resources:
         **CFG["resources"]["convert_wig"]
-    group:
-        "_ichorcna_Wig_{tumour_id}_{binSize}"
     wildcard_constraints:
         binSize = "|".join(["10", "50", "500", "1000"]),
         chrom = ".+(?<!--fixed)"
@@ -197,50 +212,48 @@ rule _ichorcna_convert_wig:
         """
 
 
-# This function is used to get the wigs of the main chromosomes, which will be stitched together
-def get_chrom_wigs(wildcards):
-    CFG = config["lcr-modules"]["ichorcna"]
+def get_chrom_wigs_offtarget(wildcards):
+    CFG = config["lcr-modules"]["ichorcna_offtarget"]
     chrs = reference_files("genomes/" + wildcards.genome_build + "/genome_fasta/main_chromosomes_withY.txt")
     with open(chrs) as file:
         chrs = file.read().rstrip("\n").split("\n")
     wigs = expand(
-        CFG["dirs"]["convert_wig"] + "{{seq_type}}--{{genome_build}}/bin{{binSize}}kb/{{tumour_id}}.bin{{binSize}}kb.{chrom}--fixed.wig", 
+        CFG["dirs"]["convert_wig"] + "{{seq_type}}--{{genome_build}}/bin{{binSize}}kb/{{tumour_id}}.bin{{binSize}}kb.{chrom}--fixed.wig",
         chrom = chrs)
     return(wigs)
 
 
-rule _ichorcna_compile_wigs:
+rule _ichorcna_offtarget_compile_wigs:
     input:
-        wigs = get_chrom_wigs
+        wigs = get_chrom_wigs_offtarget
     output:
         wig = CFG["dirs"]["compile_wigs"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.wig"
     resources:
         **CFG["resources"]["compile_wigs"]
-    group:
-        "_ichorcna_run_{tumour_id}"
     shell:
         """
             cat {input.wigs} > {output.wig}
         """
 
 
-def get_gcwig(wildcards):
-    genome_ucsc = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna"]["options"]["ichorcna_run"]["genome_ucsc"])(wildcards)
+def get_gcwig_offtarget(wildcards):
+    genome_ucsc = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna_offtarget"]["options"]["ichorcna_run"]["genome_ucsc"])(wildcards)
     return ichorcna_dir + "/inst/extdata/gc_" + genome_ucsc + "_" + wildcards.binSize + "kb.wig"
 
-def get_mapwig(wildcards):
-    genome_ucsc = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna"]["options"]["ichorcna_run"]["genome_ucsc"])(wildcards)
+def get_mapwig_offtarget(wildcards):
+    genome_ucsc = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna_offtarget"]["options"]["ichorcna_run"]["genome_ucsc"])(wildcards)
     return ichorcna_dir + "/inst/extdata/map_" + genome_ucsc + "_" + wildcards.binSize + "kb.wig"
 
-def get_centromere(wildcards):
-    centromere = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna"]["options"]["ichorcna_run"]["centromere"])(wildcards)
+def get_centromere_offtarget(wildcards):
+    centromere = op.switch_on_wildcard("genome_build", config["lcr-modules"]["ichorcna_offtarget"]["options"]["ichorcna_run"]["centromere"])(wildcards)
     return ichorcna_dir + "/inst/extdata/" + centromere
 
-rule _ichorcna_ichorcna_run:
+
+rule _ichorcna_offtarget_ichorcna_run:
     input:
-        wig = str(rules._ichorcna_compile_wigs.output.wig),
-        pon = str(rules._ichorcna_input_pon.output.pon),
-        ichorCNA = str(rules._ichorcna_install_ichorcna.output.ichorcna)
+        wig = str(rules._ichorcna_offtarget_compile_wigs.output.wig),
+        pon = str(rules._ichorcna_offtarget_input_pon.output.pon),
+        ichorCNA = str(rules._ichorcna_offtarget_install_ichorcna.output.ichorcna)
     output:
         corrDepth = CFG["dirs"]["ichorcna_run"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}/{tumour_id}.correctedDepth.txt",
         param = CFG["dirs"]["ichorcna_run"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}/{tumour_id}.params.txt",
@@ -252,53 +265,51 @@ rule _ichorcna_ichorcna_run:
         ichorcna_scripts_dir = ichorcna_scripts_dir,
         outDir = CFG["dirs"]["ichorcna_run"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}",
         name = "{tumour_id}",
-        gcwig = get_gcwig,
-        mapwig = get_mapwig,
-        centromere = get_centromere,
+        gcwig = get_gcwig_offtarget,
+        mapwig = get_mapwig_offtarget,
+        centromere = get_centromere_offtarget,
         exome = CFG["options"]["ichorcna_run"]["exome"],
         genomeStyle = op.switch_on_wildcard("genome_build", CFG["options"]["ichorcna_run"]["genomeStyle"]),
         genomeBuild = "{genome_build}",
         opts = CFG["options"]["ichorcna_run"]["opts"]
-    conda: 
+    conda:
         CFG["conda_envs"]["ichorcna_run"]
-    threads: 
+    threads:
         CFG["threads"]["ichorcna_run"]
     resources:
         **CFG["resources"]["ichorcna_run"]
-    group:
-        "_ichorcna_run_{tumour_id}"
-    wildcard_constraints: 
+    wildcard_constraints:
         binSize = "|".join(["10", "50", "500", "1000"])
     log:
         stdout = CFG["logs"]["ichorcna_run"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.stdout.log",
         stderr = CFG["logs"]["ichorcna_run"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.stderr.log"
     shell:
-         op.as_one_line("""
-            Rscript {params.ichorcna_scripts_dir}/runIchorCNA.R 
-            --id {params.name} 
-            --WIG {input.wig} 
+        op.as_one_line("""
+            Rscript {params.ichorcna_scripts_dir}/runIchorCNA.R
+            --id {params.name}
+            --WIG {input.wig}
             --gcWig {params.gcwig}
-            --mapWig {params.mapwig} 
+            --mapWig {params.mapwig}
             --normalPanel {input.pon}
             --exons.bed {params.exome}
-            --genomeStyle {params.genomeStyle} 
+            --genomeStyle {params.genomeStyle}
             --genomeBuild {params.genomeBuild}
-            --centromere {params.centromere} 
-            --outDir {params.outDir} 
+            --centromere {params.centromere}
+            --outDir {params.outDir}
             {params.opts}
             > {log.stdout} 2> {log.stderr}
         """)
 
 
 # Symlinks the final output files into the module results directory (under '99-outputs/')
-rule _ichorcna_output:
+rule _ichorcna_offtarget_output:
     input:
-        corrDepth = str(rules._ichorcna_ichorcna_run.output.corrDepth),
-        param = str(rules._ichorcna_ichorcna_run.output.param),
-        cna = str(rules._ichorcna_ichorcna_run.output.cna),
-        seg_txt = str(rules._ichorcna_ichorcna_run.output.segTxt),
-        seg = str(rules._ichorcna_ichorcna_run.output.seg),
-        plot = str(rules._ichorcna_ichorcna_run.output.plot)
+        corrDepth = str(rules._ichorcna_offtarget_ichorcna_run.output.corrDepth),
+        param = str(rules._ichorcna_offtarget_ichorcna_run.output.param),
+        cna = str(rules._ichorcna_offtarget_ichorcna_run.output.cna),
+        seg_txt = str(rules._ichorcna_offtarget_ichorcna_run.output.segTxt),
+        seg = str(rules._ichorcna_offtarget_ichorcna_run.output.seg),
+        plot = str(rules._ichorcna_offtarget_ichorcna_run.output.plot)
     output:
         corrDepth = CFG["dirs"]["outputs"] + "{seq_type}--{genome_build}/corrDepth/bin{binSize}kb/{tumour_id}.corrDepth.txt",
         param = CFG["dirs"]["outputs"] + "{seq_type}--{genome_build}/param/bin{binSize}kb/{tumour_id}.param.txt",
@@ -316,17 +327,17 @@ rule _ichorcna_output:
 
 
 # Generates the target sentinels for each run, which generate the symlinks
-rule _ichorcna_all:
+rule _ichorcna_offtarget_all:
     input:
         expand(
             [
-                str(rules._ichorcna_output.output.corrDepth),
-                str(rules._ichorcna_output.output.param),
-                str(rules._ichorcna_output.output.cna),
-                str(rules._ichorcna_output.output.seg_txt),
-                str(rules._ichorcna_output.output.seg),
-                str(rules._ichorcna_output.output.plot),
-                str(rules._ichorcna_compile_wigs.output.wig)
+                str(rules._ichorcna_offtarget_output.output.corrDepth),
+                str(rules._ichorcna_offtarget_output.output.param),
+                str(rules._ichorcna_offtarget_output.output.cna),
+                str(rules._ichorcna_offtarget_output.output.seg_txt),
+                str(rules._ichorcna_offtarget_output.output.seg),
+                str(rules._ichorcna_offtarget_output.output.plot),
+                str(rules._ichorcna_offtarget_compile_wigs.output.wig)
             ],
             zip,  # Run expand() with zip(), not product()
             seq_type=CFG["runs"]["tumour_seq_type"],
@@ -337,6 +348,4 @@ rule _ichorcna_all:
 
 ##### CLEANUP #####
 
-# Perform some clean-up tasks, including storing the module-specific
-# configuration on disk and deleting the `CFG` variable
 op.cleanup_module(CFG)
