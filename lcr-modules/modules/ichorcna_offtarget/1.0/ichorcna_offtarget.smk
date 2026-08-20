@@ -49,6 +49,7 @@ localrules:
     _ichorcna_offtarget_input_bam,
     _ichorcna_offtarget_input_pon,
     _ichorcna_offtarget_output,
+    _ichorcna_offtarget_aggregate_params,
     _ichorcna_offtarget_all
 
 # ---------------------------------------------------------------------------- #
@@ -71,6 +72,19 @@ h = md5hash.hexdigest()
 ichorcna_env = conda_prefix + "/" + h + "_"
 ichorcna_dir = ichorcna_env + "/ichorCNA"
 ichorcna_scripts_dir = conda_prefix + "/" + h + "_" + "/ichorCNA/scripts/"
+
+
+def get_input_wig_offtarget(wildcards):
+    sample_wig = config["lcr-modules"]["ichorcna_offtarget"]["inputs"].get(
+        "sample_wig", ""
+    )
+    if sample_wig:
+        return sample_wig.format(**wildcards)
+    return (
+        config["lcr-modules"]["ichorcna_offtarget"]["dirs"]["compile_wigs"] +
+        "{seq_type}--{genome_build}/bin{binSize}kb/"
+        "{tumour_id}.bin{binSize}kb.wig"
+    ).format(**wildcards)
 
 
 rule _ichorcna_offtarget_install_ichorcna:
@@ -123,7 +137,15 @@ rule _ichorcna_offtarget_exclude_panel:
         bed = CFG["inputs"]["panel_bed"]
     output:
         bam = temp(CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.bam"),
-        bai = temp(CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.bam.bai")
+        bai = temp(CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}_offtarget.bam.bai"),
+        stats = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.samtools_stats.txt",
+        flagstat = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.flagstat.txt",
+        mosdepth_summary = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.mosdepth.summary.txt",
+        mosdepth_regions = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.regions.bed.gz",
+        mosdepth_regions_csi = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.regions.bed.gz.csi",
+        mosdepth_dist = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget.mosdepth.global.dist.txt"
+    params:
+        mosdepth_prefix = CFG["dirs"]["offtarget_bam"] + "{seq_type}--{genome_build}/{tumour_id}.offtarget"
     conda:
         CFG["conda_envs"]["offtarget_bam"]
     threads:
@@ -135,7 +157,10 @@ rule _ichorcna_offtarget_exclude_panel:
     shell:
         op.as_one_line("""
         bedtools intersect -abam {input.bam} -b {input.bed} -v > {output.bam} 2>> {log} &&
-        samtools index {output.bam} 2>> {log}
+        samtools index {output.bam} 2>> {log} &&
+        samtools stats {output.bam} > {output.stats} 2>> {log} &&
+        samtools flagstat {output.bam} > {output.flagstat} 2>> {log} &&
+        mosdepth --threads {threads} --by 1000000 --no-per-base {params.mosdepth_prefix} {output.bam} 2>> {log}
         """)
 
 
@@ -251,7 +276,7 @@ def get_centromere_offtarget(wildcards):
 
 rule _ichorcna_offtarget_ichorcna_run:
     input:
-        wig = str(rules._ichorcna_offtarget_compile_wigs.output.wig),
+        wig = get_input_wig_offtarget,
         pon = str(rules._ichorcna_offtarget_input_pon.output.pon),
         ichorCNA = str(rules._ichorcna_offtarget_install_ichorcna.output.ichorcna)
     output:
@@ -326,6 +351,36 @@ rule _ichorcna_offtarget_output:
         op.relative_symlink(input.plot, output.plot, in_module=True)
 
 
+rule _ichorcna_offtarget_aggregate_params:
+    input:
+        params = expand(
+            str(rules._ichorcna_offtarget_output.output.param),
+            zip,
+            seq_type=CFG["runs"]["tumour_seq_type"],
+            genome_build=CFG["runs"]["tumour_genome_build"],
+            tumour_id=CFG["runs"]["tumour_sample_id"],
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])
+        ),
+        script = CFG["options"]["src"]["aggregate_params"]
+    output:
+        summary = CFG["dirs"]["outputs"] + "aggregate/all_samples.ichorcna_summary.tsv"
+    params:
+        input_dir = CFG["dirs"]["outputs"]
+    conda:
+        CFG["conda_envs"]["ichorcna_run"]
+    resources:
+        **CFG["resources"]["aggregate_params"]
+    log:
+        CFG["logs"]["outputs"] + "aggregate_params.log"
+    shell:
+        op.as_one_line("""
+        Rscript {input.script}
+        --input_dir {params.input_dir}
+        --output {output.summary}
+        > {log} 2>&1
+        """)
+
+
 # Generates the target sentinels for each run, which generate the symlinks
 rule _ichorcna_offtarget_all:
     input:
@@ -336,14 +391,22 @@ rule _ichorcna_offtarget_all:
                 str(rules._ichorcna_offtarget_output.output.cna),
                 str(rules._ichorcna_offtarget_output.output.seg_txt),
                 str(rules._ichorcna_offtarget_output.output.seg),
-                str(rules._ichorcna_offtarget_output.output.plot),
-                str(rules._ichorcna_offtarget_compile_wigs.output.wig)
+                str(rules._ichorcna_offtarget_output.output.plot)
             ],
             zip,  # Run expand() with zip(), not product()
             seq_type=CFG["runs"]["tumour_seq_type"],
             genome_build=CFG["runs"]["tumour_genome_build"],
             tumour_id=CFG["runs"]["tumour_sample_id"],
-            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"]))
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])) +
+        expand(
+            CFG["inputs"].get("sample_wig", "") or
+            str(rules._ichorcna_offtarget_compile_wigs.output.wig),
+            zip,
+            seq_type=CFG["runs"]["tumour_seq_type"],
+            genome_build=CFG["runs"]["tumour_genome_build"],
+            tumour_id=CFG["runs"]["tumour_sample_id"],
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])) +
+        [str(rules._ichorcna_offtarget_aggregate_params.output.summary)]
 
 
 ##### CLEANUP #####

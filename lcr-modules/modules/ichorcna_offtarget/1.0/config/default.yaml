@@ -3,12 +3,14 @@ lcr-modules:
     ichorcna_offtarget:
 
         inputs:
-            # Available wildcards: {seq_type} {genome_build} {tumour_id} {binSize} (pon only)
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {binSize}
             sample_bam: "__UPDATE__"
             sample_bai: "__UPDATE__"
             ichorcna_pon: "__UPDATE__"  # output of ichorcna_pon_offtarget module, or a PON from ichorCNA package
             # BED file with panel regions to exclude (e.g. panel + 2 kb flanks, collapsed)
             panel_bed: "__UPDATE__"
+            # Optional compiled WIG path. Empty regenerates coverage from BAM.
+            sample_wig: ""
 
         scratch_subdirectories: []
 
@@ -17,6 +19,8 @@ lcr-modules:
             # bin size in kilobases; has to be one of 10, 50, 500, 1000
             binsize_kb: 1000
             bamCoverage: "--ignoreDuplicates --extendReads"
+            src:
+                aggregate_params: "{MODSDIR}/src/aggregate_params.R"
             ichorcna_run:
                 # use bed file if sample has targeted regions, eg. exome data (optional)
                 exome: NULL
@@ -69,6 +73,8 @@ lcr-modules:
                 mem_mb: 6000
                 bam: 1
             compile_wigs:
+                mem_mb: 2000
+            aggregate_params:
                 mem_mb: 2000
 
         pairing_config:

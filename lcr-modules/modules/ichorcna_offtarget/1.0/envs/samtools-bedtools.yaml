@@ -6,3 +6,4 @@ channels:
 dependencies:
   - samtools>=1.12
   - bedtools>=2.29
+  - mosdepth>=0.3.3
