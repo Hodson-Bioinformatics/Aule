@@ -1,0 +1,106 @@
+lcr-modules:
+    liquid_biopsy_qc:
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id} {binSize}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+            reference_fasta: "__UPDATE__"
+            reference_dict: "__UPDATE__"
+            pon: "__UPDATE__"
+            corrected_depth: "__UPDATE__"
+            params: "__UPDATE__"
+            burden: "__UPDATE__"
+            gc_wig: "__UPDATE__"
+            map_wig: "__UPDATE__"
+            # Optional persistent sidecars used when compute_coverage is False.
+            # For capture they describe off-target reads; for sWGS they describe
+            # genome-wide coverage.
+            offtarget_stats: ""
+            offtarget_flagstat: ""
+            offtarget_mosdepth_summary: ""
+            offtarget_mosdepth_regions: ""
+            # Frozen output of applying the burden noise estimator to each PON normal.
+            pon_noise_reference: "__UPDATE__"
+            # Optional TSV keyed by sample_id and containing input_hge_per_ml.
+            sample_metadata: ""
+
+        scratch_subdirectories: []
+
+        options:
+            # capture: subtract panel_bed and calculate off-target coverage.
+            # swgs: calculate genome-wide coverage directly from sample_bam.
+            assay_mode: "capture"
+            compute_coverage: True
+            panel_bed: "__UPDATE__"
+            binsize_kb: 1000
+            coverage_bin_size_bp: 1000000
+            coverage_exclude_flags: 1796
+            skip_bam_metrics: False
+            normal_grid_max: 0.99
+            burden_correlation_abs_rho: 0.30
+            offtarget_fraction_tolerance: 0.02
+            provenance:
+                pon_id: "__UPDATE__"
+                pon_n_normals: "__UPDATE__"
+                pon_panel: "__UPDATE__"
+                pon_library_prep: "__UPDATE__"
+                pon_cohort: "__UPDATE__"
+                ichorcna_commit_sha: "__UPDATE__"
+                genomeStyle: "__UPDATE__"
+            # Fixed advisory thresholds. Replace only from PON-normal experiments
+            # or a pre-specified coverage titration, never from the analysed cohort.
+            thresholds:
+                min_input_hge_per_ml: 1000
+                max_dup_rate: 0.60
+                min_est_library_size: 100000
+                insert_median_min_bp: 145
+                insert_median_max_bp: 190
+                max_frac_insert_gt_300: 0.10
+                min_passing_read_ratio: 0.50
+                # Assay-specific; override for the validated sWGS design.
+                min_mean_coverage_depth: 0.05
+                max_abs_resid_gc_cor: 0.10
+                max_abs_resid_map_cor: 0.10
+                min_pon_bin_match_frac: 0.99
+                max_sigma_noise: 0.40
+                noise_ratio_min: 1.5
+                noise_ratio_max: 4.0
+            src:
+                collect: "{MODSDIR}/src/collect_qc.R"
+                aggregate: "{MODSDIR}/src/aggregate_qc.R"
+
+        conda_envs:
+            bam_metrics: "{MODSDIR}/envs/bam-metrics.yaml"
+            coverage: "{MODSDIR}/envs/coverage.yaml"
+            r: "{MODSDIR}/envs/r-base.yaml"
+            multiqc: "{MODSDIR}/envs/multiqc.yaml"
+
+        threads:
+            bam_metrics: 1
+            coverage: 2
+            multiqc: 2
+
+        resources:
+            bam_metrics:
+                # Keep headroom above the Picard JVM heap for native/JVM overhead.
+                mem_mb: 10000
+                bam: 1
+            coverage:
+                mem_mb: 7000
+                bam: 1
+            collect:
+                mem_mb: 1000
+            aggregate:
+                mem_mb: 4000
+            multiqc:
+                mem_mb: 4000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
