@@ -1,0 +1,119 @@
+lcr-modules:
+    aule_fragmentomics:
+        inputs:
+            # Available wildcards: {seq_type} {genome_build} {tumour_id}
+            # {normal_id} {pair_status}
+            sample_bam: "__UPDATE__"
+            sample_bai: "__UPDATE__"
+            reference_fasta: "__UPDATE__"
+            reference_fasta_fai: "__UPDATE__"
+            blacklist_bed: "__UPDATE__"
+            variant_vcf: "__UPDATE__"
+            # Non-overlapping genome windows, normally 5 Mb, with optional bin ID
+            # in BED column 4 and GC fraction in column 5. Used only when generation is disabled.
+            delfi_bins_bed: ""
+            # Optional completed healthy-control output pattern. {sample_id}
+            # is expanded only from options.reference_sample_ids.
+            delfi_reference_inputs: ""
+            # Optional independent healthy-control references. Raw and
+            # GC-corrected outputs remain available when these are omitted.
+            delfi_reference: ""
+            # BED4/5: chrom, start, end, TF/site-set, optional site ID.
+            # Raw downloaded BED4/5 catalogue; locally filtered and deduplicated
+            # when prepare_griffin_sites is enabled.
+            griffin_raw_sites_bed: ""
+            # Optional one-column list of TF names to retain.
+            griffin_tf_allowlist: ""
+            griffin_reference_inputs: ""
+            griffin_sites_bed: ""
+            griffin_reference: ""
+            # Optional TSV with columns length and likelihood_ratio (or weight).
+            # It must be trained independently of samples to which it is applied.
+            size_weights: ""
+
+        scratch_subdirectories: []
+
+        options:
+            # Required provenance label, e.g. full, on_target, off_target, swgs.
+            assay_partition: "__UPDATE__"
+            enable_allele_metrics: True
+            enable_size_weighting: False
+            enable_delfi: False
+            enable_griffin: False
+            # Generate deterministic local assets when their analysis is enabled.
+            generate_delfi_bins: True
+            prepare_griffin_sites: True
+            # References are built only from explicitly listed healthy controls.
+            build_delfi_reference: False
+            build_griffin_reference: False
+            reference_sample_ids: []
+            reference_min_samples: 10
+            delfi_bin_size_bp: 5000000
+            delfi_chromosomes: "autosomes"
+            delfi_max_blacklist_fraction: 0.10
+            pass_variants_only: True
+            min_mapq: 30
+            min_baseq: 30
+            exclude_flags: 3852
+            min_fragment_length: 50
+            max_fragment_length: 250
+            short_min: 100
+            short_max: 150
+            long_min: 151
+            long_max: 220
+            periodicity_max_length: 150
+            periodicity_min_bp: 8
+            periodicity_max_bp: 12
+            min_mutant_fragments: 5
+            delfi_pseudocount: 0.5
+            delfi_min_fragments_per_bin: 20
+            delfi_min_bins_for_lowess: 20
+            delfi_gc_lowess_span: 0.30
+            griffin_window_bp: 1000
+            griffin_bin_size_bp: 10
+            griffin_central_bp: 30
+            griffin_amplitude_bp: 250
+            griffin_min_bins_for_lowess: 20
+            griffin_min_sites_per_tf: 100
+            griffin_gc_lowess_span: 0.30
+            src:
+                collect: "{MODSDIR}/src/collect_fragmentomics.py"
+                collect_regional: "{MODSDIR}/src/collect_regional_fragmentomics.py"
+                aggregate: "{MODSDIR}/src/aggregate_fragmentomics.py"
+                build_regional_reference: "{MODSDIR}/src/build_regional_reference.py"
+                prepare_regional_assets: "{MODSDIR}/src/prepare_regional_assets.py"
+                assets_workflow: "{MODSDIR}/aule_fragmentomics_assets.smk"
+                regional_workflow: "{MODSDIR}/aule_fragmentomics_regional.smk"
+
+        conda_envs:
+            python: "{MODSDIR}/envs/fragmentomics.yaml"
+
+        threads:
+            collect: 1
+            regional: 1
+            assets: 1
+            reference: 1
+
+        resources:
+            collect:
+                mem_mb: 4000
+                bam: 1
+            regional:
+                mem_mb: 6000
+                bam: 1
+            assets:
+                mem_mb: 3000
+            reference:
+                mem_mb: 2000
+            aggregate:
+                mem_mb: 2000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: False
+            capture:
+                run_paired_tumours: True
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: False
