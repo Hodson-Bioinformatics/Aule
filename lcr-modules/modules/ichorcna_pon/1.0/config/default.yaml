@@ -39,7 +39,7 @@ lcr-modules:
         conda_envs:
             bamCoverage: "{MODSDIR}/envs/deeptools-3.5.1.yaml"
             bigwigToWig: "{MODSDIR}/envs/ucsc-bigwigtowig-448.yaml"
-            convert_wig: "{MODSDIR}/envs/bedops-2.4.39.yaml"
+            convert_wig: "{MODSDIR}/envs/bedops-bedtools.yaml"
             ichorcna_pon: "{MODSDIR}/envs/ichorcna-0.2.0.yaml"
 
         threads:

@@ -1,0 +1,9 @@
+name: null
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - samtools>=1.12
+  - bedtools>=2.29
+  - mosdepth>=0.3.3

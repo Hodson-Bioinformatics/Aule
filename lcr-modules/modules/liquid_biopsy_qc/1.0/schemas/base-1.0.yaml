@@ -1,0 +1,15 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+description: Required fields for each liquid-biopsy sample
+properties:
+    sample_id:
+        type: string
+    patient_id:
+        type: string
+    tissue_status:
+        type: string
+        enum: [tumour, tumor, normal]
+    seq_type:
+        type: string
+    genome_build:
+        type: string
+required: [sample_id, patient_id, tissue_status, seq_type, genome_build]

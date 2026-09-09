@@ -11,6 +11,13 @@ This release was authored by Ilias Moutsopoulos & Joanna Krupka & Rebecca Goodhe
 
 Reworked and simplified the module. Ichorcna is now installed directly in the conda environment, which makes linking extdata easier. Also reduced parameter list for the main run step, leaving it up to the user to supply extra parameters through opts if they wish.
 
+### Added
+
+- Optional `inputs.sample_wig` support. A non-empty wildcard path bypasses the
+  BAM-to-WIG branch; an empty value preserves existing preprocessing.
+- Automatic cohort aggregation of per-sample ichorCNA parameter files into
+  `99-outputs/aggregate/all_samples.ichorcna_summary.tsv`.
+
 ## [1.1] - 2022-01-08
 
 This release was authored by jawong.

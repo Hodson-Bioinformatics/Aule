@@ -137,17 +137,41 @@ for(ii in seq_along(mafs)){
 }
 
 # Get ENTREZ ID as vcf2maf always outputs 0!!!
+# Ensembl v105 = GRCh38; use the versioned archive host to avoid HTTP 500
+# errors from the main server, with fallback mirrors.
 message("Loading Biomart annotations")
+.ensembl_mirrors <- c(
+    "https://dec2021.archive.ensembl.org",   # v105 release archive
+    "https://useast.ensembl.org",
+    "https://uswest.ensembl.org",
+    "https://asia.ensembl.org"
+)
+.mart <- NULL
+for (.mirror in .ensembl_mirrors) {
+    .mart <- tryCatch(
+        biomaRt::useEnsembl(
+            biomart = "ensembl",
+            dataset = "hsapiens_gene_ensembl",
+            host    = .mirror
+        ),
+        error = function(e) {
+            message("  Mirror ", .mirror, " failed: ", conditionMessage(e))
+            NULL
+        }
+    )
+    if (!is.null(.mart)) {
+        message("  Connected via: ", .mirror)
+        break
+    }
+}
+if (is.null(.mart)) stop("All BioMart mirrors failed. Check network connectivity.")
+
 biomart_hg38 <- biomaRt::getBM(
     attributes = c("ensembl_transcript_id", "entrezgene_id",
                    "transcription_start_site", "strand"),
     filters = "ensembl_transcript_id",
     values = unique(maf_df$Transcript_ID),
-    mart = biomaRt::useEnsembl(
-        biomart="ensembl",
-        dataset="hsapiens_gene_ensembl",
-        version=105
-    ))  %>%
+    mart = .mart)  %>%
     dplyr::distinct() %>%
     group_by(ensembl_transcript_id) %>%
     dplyr::summarise(entrezgene_id = min(entrezgene_id),

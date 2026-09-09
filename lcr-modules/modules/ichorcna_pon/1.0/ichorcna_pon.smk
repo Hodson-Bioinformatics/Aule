@@ -66,13 +66,15 @@ h = md5hash.hexdigest()
 
 ichorcna_env = conda_prefix + "/" + h + "_" 
 ichorcna_dir = ichorcna_env + "/ichorCNA"
+ichorcna_lib  = ichorcna_env + "/lib/R/library"
 ichorcna_scripts_dir = conda_prefix + "/" + h + "_" + "/ichorCNA/scripts/"
 
 # Install ichorCNA
 rule _ichorcna_pon_install_ichorcna:
     params:
         branch = CFG['options']['ichorcna_branch'],
-        directory = ichorcna_dir
+        directory = ichorcna_dir,
+        lib = ichorcna_lib
     output:
         ichorcna = directory(ichorcna_env + "/lib/R/library/ichorCNA")
     log:
@@ -82,8 +84,10 @@ rule _ichorcna_pon_install_ichorcna:
         CFG['conda_envs']['ichorcna_pon']
     shell:
         op.as_one_line("""
+        rm -rf {params.directory} &&
         git clone --branch {params.branch} --single-branch https://github.com/broadinstitute/ichorCNA.git {params.directory} &&
-        R -q -e "options(timeout=9999999); install.packages('{params.directory}', repos = NULL, type = 'source')"
+        mkdir -p {params.lib} &&
+        R -q -e "options(timeout=9999999); install.packages('{params.directory}', lib='{params.lib}', repos = NULL, type = 'source')"
         """)
         
 # Symlinks the input files into the module results directory (under '00-inputs/')

@@ -51,6 +51,7 @@ localrules:
     _ichorcna_input_bam,
     _ichorcna_input_pon,
     _ichorcna_output,
+    _ichorcna_aggregate_params,
     _ichorcna_all
 
 # ---------------------------------------------------------------------------- #
@@ -76,10 +77,24 @@ ichorcna_dir = ichorcna_env + "/ichorCNA"
 ichorcna_scripts_dir = conda_prefix + "/" + h + "_" + "/ichorCNA/scripts/"
 
 
+def get_input_wig(wildcards):
+    sample_wig = config["lcr-modules"]["ichorcna"]["inputs"].get(
+        "sample_wig", ""
+    )
+    if sample_wig:
+        return sample_wig.format(**wildcards)
+    return (
+        config["lcr-modules"]["ichorcna"]["dirs"]["compile_wigs"] +
+        "{seq_type}--{genome_build}/bin{binSize}kb/"
+        "{tumour_id}.bin{binSize}kb.wig"
+    ).format(**wildcards)
+
+
 rule _ichorcna_install_ichorcna:
     params:
         branch = CFG['options']['ichorcna_branch'],
-        directory = ichorcna_dir
+        directory = ichorcna_dir,
+        lib = ichorcna_env + "/lib/R/library"
     output:
         ichorcna = directory(ichorcna_env + "/lib/R/library/ichorCNA")
     log:
@@ -89,8 +104,10 @@ rule _ichorcna_install_ichorcna:
         CFG['conda_envs']['ichorcna_run']
     shell:
         op.as_one_line("""
+        rm -rf {params.directory} &&
         git clone --branch {params.branch} --single-branch https://github.com/broadinstitute/ichorCNA.git {params.directory} &&
-        R -q -e "options(timeout=9999999); install.packages('{params.directory}', repos = NULL, type = 'source')"
+        mkdir -p {params.lib} &&
+        R -q -e "options(timeout=9999999); install.packages('{params.directory}', lib='{params.lib}', repos = NULL, type = 'source')"
         """)
 
 
@@ -123,7 +140,7 @@ rule _ichorcna_bamCoverage:
     output:
         bw = CFG["dirs"]["bamCoverage"] + "{seq_type}--{genome_build}/bin{binSize}kb/{tumour_id}.bin{binSize}kb.bw"
     params:
-         binSize = "{binSize}",
+        binSize = "{binSize}",
         opts = CFG["options"]["bamCoverage"]
     conda: 
         CFG["conda_envs"]["bamCoverage"]
@@ -235,7 +252,7 @@ def get_centromere(wildcards):
 
 rule _ichorcna_ichorcna_run:
     input:
-        wig = str(rules._ichorcna_compile_wigs.output.wig),
+        wig = get_input_wig,
         pon = str(rules._ichorcna_input_pon.output.pon),
         ichorCNA = str(rules._ichorcna_install_ichorcna.output.ichorcna)
     output:
@@ -312,6 +329,36 @@ rule _ichorcna_output:
         op.relative_symlink(input.plot, output.plot, in_module=True)
 
 
+rule _ichorcna_aggregate_params:
+    input:
+        params = expand(
+            str(rules._ichorcna_output.output.param),
+            zip,
+            seq_type=CFG["runs"]["tumour_seq_type"],
+            genome_build=CFG["runs"]["tumour_genome_build"],
+            tumour_id=CFG["runs"]["tumour_sample_id"],
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])
+        ),
+        script = CFG["options"]["src"]["aggregate_params"]
+    output:
+        summary = CFG["dirs"]["outputs"] + "aggregate/all_samples.ichorcna_summary.tsv"
+    params:
+        input_dir = CFG["dirs"]["outputs"]
+    conda:
+        CFG["conda_envs"]["ichorcna_run"]
+    resources:
+        **CFG["resources"]["aggregate_params"]
+    log:
+        CFG["logs"]["outputs"] + "aggregate_params.log"
+    shell:
+        op.as_one_line("""
+        Rscript {input.script}
+        --input_dir {params.input_dir}
+        --output {output.summary}
+        > {log} 2>&1
+        """)
+
+
 # Generates the target sentinels for each run, which generate the symlinks
 rule _ichorcna_all:
     input:
@@ -322,14 +369,22 @@ rule _ichorcna_all:
                 str(rules._ichorcna_output.output.cna),
                 str(rules._ichorcna_output.output.seg_txt),
                 str(rules._ichorcna_output.output.seg),
-                str(rules._ichorcna_output.output.plot),
-                str(rules._ichorcna_compile_wigs.output.wig)
+                str(rules._ichorcna_output.output.plot)
             ],
             zip,  # Run expand() with zip(), not product()
             seq_type=CFG["runs"]["tumour_seq_type"],
             genome_build=CFG["runs"]["tumour_genome_build"],
             tumour_id=CFG["runs"]["tumour_sample_id"],
-            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"]))
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])) +
+        expand(
+            CFG["inputs"].get("sample_wig", "") or
+            str(rules._ichorcna_compile_wigs.output.wig),
+            zip,
+            seq_type=CFG["runs"]["tumour_seq_type"],
+            genome_build=CFG["runs"]["tumour_genome_build"],
+            tumour_id=CFG["runs"]["tumour_sample_id"],
+            binSize=[CFG["options"]["binsize_kb"]] * len(CFG["runs"]["tumour_sample_id"])) +
+        [str(rules._ichorcna_aggregate_params.output.summary)]
 
 
 ##### CLEANUP #####
