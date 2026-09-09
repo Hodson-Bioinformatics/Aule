@@ -78,27 +78,15 @@ for (i in seq_along(p1_files)) {
   }
 }
 
-# Combine using pdftools::pdf_combine if available, otherwise direct concatenation
-if (length(combined_pdfs) > 0) {
-  # Try to use pdf_combine on the files directly
-  all_valid_files <- c(p1_files, p2_files)
-  all_valid_files <- all_valid_files[file.exists(all_valid_files)]
-  
-  if (length(all_valid_files) > 0) {
-    tryCatch({
-      pdftools::pdf_combine(all_valid_files, output = output_path)
-      cat(sprintf("Combined %d PDFs into %s\n", length(all_valid_files), output_path))
-    }, error = function(e) {
-      warning(sprintf("pdf_combine failed: %s. Writing file list instead.", e$message))
-      # Fallback: write file list
-      writeLines(all_valid_files, output_path)
-    })
-  }
+# Ensure output directory exists
+
+dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
+
+# Combine using pdftools::pdf_combine
+if (length(all_valid_files) > 0) {
+  pdftools::pdf_combine(all_valid_files, output = output_path)
+  cat(sprintf("Combined %d PDFs into %s\n", length(all_valid_files), output_path))
 } else {
   stop("No valid PDF files to combine")
 }
-
-# Ensure output directory exists
-dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
-
 cat(sprintf("Output PDF: %s\n", output_path))
