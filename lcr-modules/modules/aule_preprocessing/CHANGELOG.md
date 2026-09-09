@@ -5,6 +5,18 @@ All notable changes to the `aule_preprocessing` module will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0] - 2026-08-21
+
+Redesigns UMI handling to read UMIs inline from the R1/R2 read sequence
+(`fgbio ExtractUmisFromBam`, read structure `5M2S+T 5M2S+T`) instead of from a
+separate UMI FASTQ (`fgbio AnnotateBamWithUmis`, 1.0). The sample sheet no
+longer needs a `sample_fastq_UMI` column. See the module README's
+"Differences from 1.0, and which version to use" section before switching an
+existing pipeline over -- the two versions assume different library UMI
+layouts and are not interchangeable, and 2.0 no longer populates the `RQ`
+(UMI base-quality) tag, since `ExtractUmisFromBam` has no equivalent to
+`AnnotateBamWithUmis`'s `-q RQ`.
+
 ## [1.0] - 2024-05-15
 
 This release was authored by Joanna A. Krupka.

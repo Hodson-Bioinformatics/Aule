@@ -1,0 +1,35 @@
+name: bwa_aule
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - bwa=0.7.17=h7132678_9
+  - bzip2=1.0.8=h7f98852_4
+  - c-ares=1.18.1=h7f98852_0
+  - ca-certificates=2022.12.7=ha878542_0
+  - curl=7.88.1=hdc1c0ab_1
+  - htslib=1.9=h4da6232_3
+  - keyutils=1.6.1=h166bdaf_0
+  - krb5=1.20.1=h81ceb04_0
+  - libcurl=7.88.1=hdc1c0ab_1
+  - libdeflate=1.18=h0b41bf4_0
+  - libedit=3.1.20191231=h46ee950_2
+  - libev=4.33=h516909a_1
+  - libgcc-ng=12.2.0=h65d4601_19
+  - libgomp=12.2.0=h65d4601_19
+  - libnghttp2=1.52.0=h61bc06f_0
+  - libnsl=2.0.0=h7f98852_0
+  - libssh2=1.10.0=hf14f497_3
+  - libstdcxx-ng=12.2.0=h46fd767_19
+  - libzlib=1.2.13=h166bdaf_4
+  - ncurses=6.1=hf484d3e_1002
+  - openssl=3.1.0=h0b41bf4_0
+  - perl=5.32.1=2_h7f98852_perl5
+  - samtools=1.9=h10a08f8_12
+  - xz=5.2.6=h166bdaf_0
+  - zlib=1.2.13=h166bdaf_4
+  - zstd=1.5.2=h3eb15da_6
+prefix: /home/USSR/jak75/miniconda3/envs/bwa_aule
