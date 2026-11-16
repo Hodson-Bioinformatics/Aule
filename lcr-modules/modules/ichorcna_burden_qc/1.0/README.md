@@ -1,11 +1,15 @@
-# ichorcna_burden_offtarget 1.0
+# ichorcna_burden_qc 1.0
 
 ## Purpose
 
-This module derives a ploidy-free copy-number burden index from off-target
-coverage. It runs the standard BAM-to-WIG preprocessing (or accepts a pre-built
-WIG through `inputs.sample_wig`), runs ichorCNA once, and consumes the resulting
-`correctedDepth.txt`. It does not reimplement ichorCNA normalization.
+This module derives a ploidy-free copy-number burden index and technical-noise
+metrics from an existing `ichorcna_offtarget` fit. It reads the corrected depth
+and segmentation that `ichorcna_offtarget` published, so every metric describes
+that same fit. It never computes coverage and never runs ichorCNA, and it does
+not reimplement ichorCNA normalization. Run `ichorcna_offtarget` first.
+
+It was previously `ichorcna_burden_offtarget`, which could also compute
+coverage and run its own ichorCNA fit; see the CHANGELOG.
 
 Off-target coverage does not jointly identify tumour fraction and ploidy. A
 constant change in baseline ploidy can be absorbed by the model while producing
@@ -45,19 +49,23 @@ sensitivity strata and are never grounds for excluding a sample.
 
 ## Inputs and execution
 
-The module supports three input modes, in priority order:
+Two inputs, both required:
 
-1. Set `inputs.ichorcna_output_dir` to an existing ichorCNA `99-outputs` root
-   to reuse corrected depth, CNA, segmentation, and plot files. This bypasses
-   both preprocessing and ichorCNA.
-2. Set `inputs.sample_wig` to an existing compiled WIG path to bypass the
-   BAM-to-bigWig-to-WIG branch while still running ichorCNA.
-3. Leave both values empty to generate off-target coverage from BAM and run
-   ichorCNA normally.
+- `inputs.ichorcna_output_dir`: the `99-outputs` root of an `ichorcna_offtarget`
+  run, for example `<results>/ichorcna_offtarget-1.0/99-outputs`. For each
+  tumour sample the module reads
+  `{seq_type}--{genome_build}/corrDepth/bin{binSize}kb/{tumour_id}.corrDepth.txt`
+  and `{seq_type}--{genome_build}/seg_txt/bin{binSize}kb/{tumour_id}.seg.txt`.
+  The module stops at startup if this is unset.
+- `inputs.ichorcna_pon`: the PON that fit used. It is recorded in the burden
+  table for provenance; nothing is renormalised.
 
-The PON remains required for burden-output provenance. Reused ichorCNA outputs
-must have been generated with the configured PON, bin size, and normalization
-settings.
+`options.binsize_kb` must equal the fit's bin size; a mismatch fails with
+missing input files. The R scripts are base R and run in `ichorcna_offtarget`'s
+conda environment, which that run has already built.
+
+In one Snakefile, include `ichorcna_offtarget` before this module and point
+`ichorcna_output_dir` at its `99-outputs`; Snakemake then runs the two in order.
 
 Run the base-R tests from this version directory:
 
@@ -188,7 +196,7 @@ PNG output is 600 dpi.
 ```bash
 Rscript analysis/vc_diagnostics.R \
   --burden all_samples.burden.cohort_relative.tsv \
-  --corrected_dir 06-ichorcna_run \
+  --corrected_dir <results>/ichorcna_offtarget-1.0/06-ichorcna_run \
   --output_dir vc_diagnostics
 ```
 

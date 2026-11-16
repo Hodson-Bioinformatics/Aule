@@ -6,7 +6,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## Known issues (superseded by `ichorcna_burden_offtarget`)
+## Known issues (superseded by `ichorcna_burden_offtarget`, now `ichorcna_burden_qc`)
 
 - The Pass-2 normal grid is centred on `pass1_tf`, rather than
   `1 - pass1_tf` (`1.0/src/pass1_qc.R:246-247`); the Pass-1 TF therefore fell

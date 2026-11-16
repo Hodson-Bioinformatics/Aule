@@ -98,15 +98,15 @@ test_that("CLI requires table, sample and output", {
   expect_error(main(c("--table", "a", "--sample", "b")), "required")
 })
 
-test_that("workflow publishes diagnostics and supports three input modes", {
+test_that("workflow publishes diagnostics and requires an ichorcna_offtarget fit", {
   workflow <- paste(readLines(
-    file.path(test_dir, "../ichorcna_burden_offtarget.smk")
+    file.path(test_dir, "../ichorcna_burden_qc.smk")
   ), collapse = "\n")
   config <- paste(readLines(
     file.path(test_dir, "../config/default.yaml")
   ), collapse = "\n")
   expect_true(grepl(
-    "rule _ichorcna_burden_offtarget_plot_vc_diagnostic:",
+    "rule _ichorcna_burden_qc_plot_vc_diagnostic:",
     workflow, fixed = TRUE
   ))
   expect_true(grepl(
@@ -116,13 +116,16 @@ test_that("workflow publishes diagnostics and supports three input modes", {
     "plot_vc_diagnostic: \"{MODSDIR}/src/plot_vc_diagnostic.R\"",
     config, fixed = TRUE
   ))
-  expect_true(grepl("ichorcna_output_dir: \"\"", config, fixed = TRUE))
+  expect_true(grepl("ichorcna_output_dir: \"__UPDATE__\"", config, fixed = TRUE))
   expect_true(grepl(
-    "def _get_burden_ichor_output(wildcards, output_name):",
+    "def _get_ichorcna_output(wildcards, output_name):",
     workflow, fixed = TRUE
   ))
   expect_true(grepl("bins = _get_burden_corr_depth", workflow, fixed = TRUE))
-  expect_true(grepl("generated = getattr(", workflow, fixed = TRUE))
+  # The module must never run ichorCNA or compute coverage itself.
+  expect_true(!grepl("runIchorCNA.R", workflow, fixed = TRUE))
+  expect_true(!grepl("bamCoverage", workflow, fixed = TRUE))
+  expect_true(!grepl("install_ichorcna", workflow, fixed = TRUE))
 })
 
 test_that("source guard does not execute the CLI", {

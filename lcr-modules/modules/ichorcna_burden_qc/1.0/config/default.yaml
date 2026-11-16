@@ -1,0 +1,62 @@
+lcr-modules:
+    ichorcna_burden_qc:
+        inputs:
+            # REQUIRED. The 99-outputs root of an ichorcna_offtarget run, e.g.
+            # <results>/ichorcna_offtarget-1.0/99-outputs. The module reads
+            # corrDepth/ and seg_txt/ from it and never runs ichorCNA itself.
+            # Available wildcards: {seq_type} {genome_build}
+            ichorcna_output_dir: "__UPDATE__"
+            # The PON that ichorcna_offtarget run used; recorded in the burden
+            # table for provenance.
+            ichorcna_pon: "__UPDATE__"
+
+        scratch_subdirectories: []
+
+        options:
+            # Must equal the binsize_kb of the ichorcna_offtarget run. A
+            # mismatch fails with missing input files rather than running.
+            binsize_kb: 1000
+
+            src:
+                burden_index: "{MODSDIR}/src/burden_index.R"
+                aggregate_burden: "{MODSDIR}/src/aggregate_burden.R"
+                plot_vc_diagnostic: "{MODSDIR}/src/plot_vc_diagnostic.R"
+
+            burden:
+                exclude_bed: ""
+                min_bins: 200
+                winsor_p: 0.005
+                window_widths: "1,2,4,8,16"
+                detect_w: 8
+                n_perm: 500
+                n_boot: 300
+                block: 20
+                seed: 1
+                fga_k: 2.5
+                include_sex_chrom: False
+
+        conda_envs:
+            # The scripts are base R. They run in ichorcna_offtarget's
+            # environment, which that run has already built, so no new
+            # environment is created and the R version matches the fit's.
+            r: "{REPODIR}/modules/ichorcna_offtarget/1.0/envs/ichorcna-0.2.0.yaml"
+
+        # Every rule runs on one core. Memory is kept under ~3.4 GB so that a
+        # one-core Slurm job on a ~3.4 GB-per-core partition is not refused.
+        resources:
+            burden:
+                mem_mb: 3000
+            plot_vc_diagnostic:
+                mem_mb: 2000
+            aggregate:
+                mem_mb: 3000
+
+        pairing_config:
+            genome:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
+            capture:
+                run_paired_tumours: False
+                run_unpaired_tumours_with: "no_normal"
+                run_paired_tumours_as_unpaired: True
