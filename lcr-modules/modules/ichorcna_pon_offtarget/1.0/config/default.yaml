@@ -18,7 +18,9 @@ lcr-modules:
             pon_suffix: "full"
                     # available suffixes: [full, panel]
             bamCoverage:
-                opts: "--ignoreDuplicates --extendReads --samFlagExclude 1028 --minMappingQuality 20"
+                # --samFlagExclude 2048 drops supplementary alignments. Samples must be
+                # counted with the same filters (ichorcna_offtarget default since 2026-11-17).
+                opts: "--ignoreDuplicates --extendReads --samFlagExclude 2048 --minMappingQuality 20"
             ichorcna_pon:
                 genome_style:
                     grch37: "NCBI"

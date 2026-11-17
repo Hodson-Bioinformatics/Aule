@@ -5,6 +5,19 @@ All notable changes to the `ichorcna_offtarget` module will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0] - 2026-11-17
+
+### Changed
+
+- Default `options.bamCoverage` is now
+  `--ignoreDuplicates --extendReads --samFlagExclude 2048 --minMappingQuality 20`
+  (was `--ignoreDuplicates --extendReads`), matching the Aule-setups
+  `ichorcna-offtarget` setup. Supplementary alignments and reads with MAPQ < 20
+  are no longer counted. Runs that relied on the old default will get slightly
+  different coverage; set `options.bamCoverage` in your config to keep the old
+  behaviour. Coverage should be counted with the same filters as the PoN: the
+  12-control Novogene PoN was built with `--samFlagExclude 1028`.
+
 ## [1.0] - 2026-04-23
 
 This release was authored by Joanna A. Krupka.
