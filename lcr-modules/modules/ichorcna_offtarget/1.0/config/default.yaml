@@ -18,7 +18,10 @@ lcr-modules:
             ichorcna_branch: "master"
             # bin size in kilobases; has to be one of 10, 50, 500, 1000
             binsize_kb: 1000
-            bamCoverage: "--ignoreDuplicates --extendReads"
+            # deepTools bamCoverage filters. --samFlagExclude 2048 drops supplementary
+            # alignments; --minMappingQuality 20 drops low-MAPQ reads. Use the same
+            # filters the PoN was built with (the 12-control Novogene PoN used 1028).
+            bamCoverage: "--ignoreDuplicates --extendReads --samFlagExclude 2048 --minMappingQuality 20"
             src:
                 aggregate_params: "{MODSDIR}/src/aggregate_params.R"
             ichorcna_run:
